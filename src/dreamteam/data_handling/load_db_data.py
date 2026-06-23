@@ -10,6 +10,7 @@ unique_combinations = all_trains[["Gattung", "Stamm"]].drop_duplicates()
 
 
 url = "https://apis.deutschebahn.com/db/apis/ris-journeys/v2/find"
+journey_url = 
 
 
 
@@ -28,5 +29,9 @@ for index, row in unique_combinations.iterrows():
         response = requests.get(url, headers=headers, params=querystring)
         response= response.json()
         if response.get("journeys"):
-            train = response["journeys"][0]["train"]["name"]
-            df = pd.DataFrame(response["journeys"][0]["stops"])
+            journeys = response.get("journeys")
+            for journey in journeys:
+
+                response = requests.get(url, headers=headers, params=querystring)
+                if "stops" in journey:
+                    df = pd.DataFrame(journey["stops"])
