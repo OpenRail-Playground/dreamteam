@@ -1,6 +1,7 @@
 # Our Cool Project
 
 <!-- TODO: Shortly explain what this project is about -->
+Dreamteam
 
 ## Background
 
@@ -19,3 +20,4 @@ This project has been initiated during the [Hack4Rail 2026](https://hack4rail.or
 <!-- If you decide for another license, please change it here, and exchange the LICENSE file -->
 
 The content of this repository is licensed under the [Apache 2.0 license](LICENSE).
+
