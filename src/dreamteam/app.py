@@ -296,5 +296,78 @@ def get_stats():
     })
 
 
+@app.route('/api/train-details/<train_id>/<date>', methods=['GET'])
+def get_train_details(train_id, date):
+    """Get detailed train journey data including all stops and time data from operators."""
+    zuglaeufe = load_csv("Zuglaeufe.csv")
+    zugnummern = load_csv("Zugnummern.csv")
+    ares = load_csv("ARES.csv")
+
+    # Find route for this train and date
+    route_info = {}
+    for row in zugnummern:
+        try:
+            datum_str = row.get("Datum", "").strip()
+            d, m, y = datum_str.split(".")
+            datum_iso = f"{y}-{m}-{d}"
+        except ValueError:
+            datum_iso = datum_str
+
+        if row.get("Zugnummer", "").strip() == train_id and datum_iso == date:
+            route_info = {
+                "start_station": row.get("Startbahnhof", "").strip(),
+                "end_station": row.get("Zielbahnhof", "").strip()
+            }
+            break
+
+    # Collect all stops for this train on this date
+    stops = {}
+    for row in zuglaeufe:
+        if row.get("Zugnummer", "").strip() == train_id and row.get("Datum", "").strip() == date:
+            halt = row.get("Halt", "").strip()
+            if halt not in stops:
+                stops[halt] = {
+                    "halt": halt,
+                    "km": row.get("km", "0 km").strip(),
+                    "operators": {}
+                }
+            
+            # Collect times for each operator
+            for op_prefix, op_name in [("sbb", "SBB"), ("oebb", "ÖBB"), ("db", "DB")]:
+                an_key = f"an_{op_prefix}"
+                ab_key = f"ab_{op_prefix}"
+                an_time = row.get(an_key, "").strip()
+                ab_time = row.get(ab_key, "").strip()
+                
+                stops[halt]["operators"][op_name] = {
+                    "arrival": an_time,
+                    "departure": ab_time
+                }
+            
+            # Get ARES status if available
+            stats_ares = row.get("Stats_ARES", "").strip()
+            if stats_ares != "OK":
+                stops[halt]["ares_status"] = stats_ares
+
+    # Build response
+    response = {
+        "train_id": train_id,
+        "date": date,
+        "route": f"{route_info.get('start_station', '')} → {route_info.get('end_station', '')}",
+        "start_station": route_info.get("start_station", ""),
+        "end_station": route_info.get("end_station", ""),
+        "stops": []
+    }
+
+    # Convert stops dict to list maintaining order
+    for halt, data in stops.items():
+        response["stops"].append(data)
+
+    if not response["stops"]:
+        return jsonify({"error": f"No data found for train {train_id} on {date}"}), 404
+
+    return jsonify(response)
+
+
 if __name__ == '__main__':
     app.run(debug=True, port=5000)

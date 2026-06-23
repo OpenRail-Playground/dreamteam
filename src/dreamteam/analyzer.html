@@ -626,8 +626,8 @@
       border-radius: var(--radius-sm);
       font-size: 11px;
       font-weight: 600;
-      background: var(--color-info-bg);
-      color: var(--color-info);
+      background: var(--color-primary-light);
+      color: var(--color-primary-dark);
     }
 
     .disc-entry-text {
@@ -1057,6 +1057,65 @@
       border-color: var(--color-primary);
     }
 
+    .date-range-control {
+      position: relative;
+    }
+
+    .date-range-popover {
+      position: absolute;
+      top: calc(100% + 8px);
+      left: 0;
+      z-index: 120;
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-md);
+      padding: 10px;
+      display: none;
+      min-width: 280px;
+    }
+
+    .date-range-popover.open {
+      display: block;
+    }
+
+    .date-range-fields {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .date-range-field {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      font-size: 11.5px;
+      color: var(--color-text-muted);
+      font-weight: 600;
+    }
+
+    .date-range-input {
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      padding: 6px 8px;
+      font-size: 12px;
+      color: var(--color-text);
+      background: var(--color-bg);
+      outline: none;
+    }
+
+    .date-range-input:focus {
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 3px rgba(235,0,0,0.10);
+    }
+
+    .date-range-actions {
+      margin-top: 10px;
+      display: flex;
+      justify-content: flex-end;
+      gap: 6px;
+    }
+
     /* ===========================
        TOAST NOTIFICATION
     =========================== */
@@ -1187,6 +1246,410 @@
       color: var(--color-text-light);
       margin: 0 4px;
     }
+
+    /* ===========================
+       DETAIL MODAL
+    =========================== */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 20, 35, 0.55);
+      backdrop-filter: blur(3px);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.22s ease;
+    }
+
+    .modal-overlay.open {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .modal {
+      background: var(--color-surface);
+      border-radius: var(--radius-lg);
+      box-shadow: 0 24px 64px rgba(0,0,0,0.22);
+      width: 100%;
+      max-width: 1200px;
+      max-height: 90vh;
+      display: flex;
+      flex-direction: column;
+      transform: translateY(16px) scale(0.98);
+      transition: transform 0.22s ease;
+      overflow: hidden;
+    }
+
+    .modal-overlay.open .modal {
+      transform: translateY(0) scale(1);
+    }
+
+    /* Modal Header */
+    .modal-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      padding: 20px 24px 16px;
+      border-bottom: 1px solid var(--color-border);
+      flex-shrink: 0;
+    }
+
+    .modal-header-info { flex: 1; }
+
+    .modal-train-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--color-primary);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 800;
+      padding: 4px 12px;
+      border-radius: var(--radius-sm);
+      letter-spacing: 0.03em;
+      margin-bottom: 6px;
+    }
+
+    .modal-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--color-text);
+    }
+
+    .modal-meta {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-top: 6px;
+      flex-wrap: wrap;
+    }
+
+    .modal-meta-item {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 12.5px;
+      color: var(--color-text-muted);
+    }
+
+    .modal-meta-item strong {
+      color: var(--color-text);
+      font-weight: 600;
+    }
+
+    .modal-close {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: none;
+      background: #F3F4F6;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      color: var(--color-text-muted);
+      transition: background var(--transition), color var(--transition);
+      flex-shrink: 0;
+    }
+
+    .modal-close:hover {
+      background: #FEE2E2;
+      color: var(--color-primary);
+    }
+
+    /* Discrepancy banner */
+    .modal-disc-banner {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 24px;
+      background: #FFF7F7;
+      border-bottom: 1px solid #FECACA;
+      flex-shrink: 0;
+    }
+
+    .modal-disc-banner-icon { font-size: 16px; }
+
+    .modal-disc-banner-text {
+      font-size: 13px;
+      color: #991B1B;
+    }
+
+    .modal-disc-banner-text strong { font-weight: 700; }
+
+    /* Modal body */
+    .modal-body {
+      flex: 1;
+      overflow: auto;
+      padding: 0;
+    }
+
+    /* Matrix wrapper */
+    .matrix-wrapper {
+      overflow-x: auto;
+      padding: 20px 24px;
+    }
+
+    /* Loading state */
+    .matrix-loading {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 60px 24px;
+      gap: 14px;
+      color: var(--color-text-muted);
+    }
+
+    .matrix-spinner {
+      width: 32px;
+      height: 32px;
+      border: 3px solid var(--color-border);
+      border-top-color: var(--color-primary);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    .matrix-loading-text { font-size: 13px; }
+
+    /* Matrix table */
+    .matrix-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      font-size: 12.5px;
+      min-width: 900px;
+    }
+
+    /* Column group headers (top row) */
+    .matrix-table .col-group-header {
+      background: var(--color-sidebar-bg);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      padding: 8px 14px;
+      text-align: center;
+      border-right: 2px solid rgba(255,255,255,0.15);
+      white-space: nowrap;
+    }
+
+    .matrix-table .col-group-header:first-child {
+      text-align: left;
+      border-radius: var(--radius-sm) 0 0 0;
+      background: #2A3347;
+    }
+
+    .matrix-table .col-group-header:last-child {
+      border-right: none;
+      border-radius: 0 var(--radius-sm) 0 0;
+    }
+
+    /* Sub-headers (second row) */
+    .matrix-table .col-sub-header {
+      background: #F3F4F6;
+      color: var(--color-text-muted);
+      font-size: 10.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      padding: 7px 10px;
+      text-align: center;
+      border-bottom: 2px solid var(--color-border);
+      border-right: 1px solid var(--color-border);
+      white-space: nowrap;
+    }
+
+    .matrix-table .col-sub-header:first-child {
+      text-align: left;
+      background: #EBEDF2;
+      min-width: 180px;
+      border-right: 2px solid var(--color-border);
+    }
+
+    .matrix-table .col-sub-header.sub-arr { color: #1D4ED8; }
+    .matrix-table .col-sub-header.sub-dep { color: #15803D; }
+
+    /* Data rows */
+    .matrix-table tbody tr { transition: background var(--transition); }
+    .matrix-table tbody tr:hover td { background: #F0F4FF; }
+
+    .matrix-table td {
+      padding: 0;
+      border-bottom: 1px solid #F0F2F7;
+      border-right: 1px solid #F0F2F7;
+      vertical-align: middle;
+    }
+
+    .matrix-table td:last-child { border-right: none; }
+
+    /* Station cell */
+    .station-cell {
+      padding: 0;
+      border-right: 2px solid var(--color-border) !important;
+      min-width: 180px;
+      background: #FAFBFC;
+    }
+
+    .station-inner {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+    }
+
+    .station-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      border: 2px solid var(--color-primary);
+      background: #fff;
+      flex-shrink: 0;
+    }
+
+    .station-dot.origin,
+    .station-dot.destination {
+      background: var(--color-primary);
+    }
+
+    .station-name-wrap { display: flex; flex-direction: column; }
+
+    .station-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--color-text);
+      white-space: nowrap;
+    }
+
+    .station-km {
+      font-size: 10.5px;
+      color: var(--color-text-muted);
+      margin-top: 1px;
+    }
+
+    /* Time cell */
+    .time-cell {
+      padding: 8px 10px;
+      text-align: center;
+      border-right: 1px solid #F0F2F7;
+      min-width: 70px;
+    }
+
+    .time-cell.separator-right {
+      border-right: 2px solid var(--color-border) !important;
+    }
+
+    .time-value {
+      font-size: 13px;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+      color: var(--color-text);
+      display: block;
+    }
+
+    .time-value.arr   { color: #1D4ED8; }
+    .time-value.dep   { color: #15803D; }
+    .time-value.empty { color: var(--color-text-light); font-weight: 400; font-size: 12px; }
+
+    /* Discrepancy highlights */
+    .time-cell.disc       { background: #FFF7F0 !important; }
+    .time-cell.disc .time-value { color: var(--color-warning); }
+
+    .time-cell.disc-error { background: #FFF1F1 !important; }
+    .time-cell.disc-error .time-value { color: var(--color-primary); }
+
+    .disc-marker {
+      display: block;
+      font-size: 9px;
+      color: var(--color-warning);
+      font-weight: 700;
+      margin-top: 1px;
+    }
+
+    .disc-marker.error { color: var(--color-primary); }
+
+    /* ARES cell */
+    .ares-cell {
+      padding: 8px 12px;
+      min-width: 120px;
+      border-right: none;
+    }
+
+    .ares-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 8px;
+      border-radius: var(--radius-sm);
+      font-size: 11px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .ares-ok      { background: #DCFCE7; color: #166534; }
+    .ares-warning { background: #FEF3C7; color: #92400E; }
+    .ares-error   { background: #FEE2E2; color: #991B1B; }
+    .ares-empty   { background: #F3F4F6; color: #9CA3AF; }
+
+    /* Column group right border */
+    .col-group-border-right {
+      border-right: 2px solid var(--color-border) !important;
+    }
+
+    /* Legend */
+    .matrix-legend {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      padding: 12px 24px 20px;
+      flex-wrap: wrap;
+      border-top: 1px solid var(--color-border);
+    }
+
+    .legend-title {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--color-text-muted);
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: var(--color-text-muted);
+    }
+
+    .legend-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 2px;
+    }
+
+    .legend-arr  { background: #DBEAFE; border: 1px solid #93C5FD; }
+    .legend-dep  { background: #DCFCE7; border: 1px solid #86EFAC; }
+    .legend-disc { background: #FEF3C7; border: 1px solid #FCD34D; }
+    .legend-err  { background: #FEE2E2; border: 1px solid #FCA5A5; }
+
+    /* Modal footer */
+    .modal-footer {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 10px;
+      padding: 14px 24px;
+      border-top: 1px solid var(--color-border);
+      background: #FAFBFC;
+      flex-shrink: 0;
+    }
   </style>
 </head>
 <body>
@@ -1198,7 +1661,7 @@
     <div class="header-brand">
       <div class="header-logo">🚆</div>
       <div>
-        <div class="header-title">Fahrplan-Diskrepanz-Analyzer</div>
+        <div class="header-title">Nightwatch</div>
         <div class="header-subtitle">Vergleich: SBB · ÖBB · DB</div>
       </div>
     </div>
@@ -1254,7 +1717,7 @@
     </a>
 
     <div class="sidebar-footer">
-      v2.4.1 · © 2026 SBB
+      v0.0.1 · © 2026 SBB
     </div>
   </aside>
 
@@ -1319,16 +1782,31 @@
 
       <!-- Toolbar -->
       <div class="toolbar">
-        <span style="font-size:15px">📅</span>
-        <div class="date-range-wrap">
-          📅 20.06.2026 – 30.06.2026 ▾
+        <div class="date-range-control" id="dayDateRangeControl">
+          <div class="date-range-wrap" id="dayDateRangeTrigger" role="button" tabindex="0" aria-label="Datumsbereich auswählen" aria-expanded="false">
+            📅 <span id="dayDateRangeLabel">20.06.2026 – 30.06.2026</span> ▾
+          </div>
+          <div class="date-range-popover" id="dayDateRangePopover">
+            <div class="date-range-fields">
+              <label class="date-range-field">Von
+                <input class="date-range-input" type="date" id="dayDateFrom" />
+              </label>
+              <label class="date-range-field">Bis
+                <input class="date-range-input" type="date" id="dayDateTo" />
+              </label>
+            </div>
+            <div class="date-range-actions">
+              <button class="btn btn-secondary btn-sm" type="button" id="dayDateResetBtn">Zurücksetzen</button>
+              <button class="btn btn-primary btn-sm" type="button" id="dayDateApplyBtn">Anwenden</button>
+            </div>
+          </div>
         </div>
 
         <select class="filter-select">
           <option>Quelle: Alle</option>
-          <option>NeTS-AT</option>
-          <option>CIS</option>
-          <option>Hafas</option>
+          <option>SBB</option>
+          <option>ÖBB</option>
+          <option>DB</option>
         </select>
 
         <div class="toolbar-spacer"></div>
@@ -1409,7 +1887,7 @@
             <span class="history-icon">📦</span>
             <div class="history-meta">
               <div class="history-title">Dataload #2451 — 23.06.2026, 11:42:17</div>
-              <div class="history-subtitle">Ausgelöst durch: <strong>Automatisch (Cron)</strong> &nbsp;·&nbsp; Datenquellen: NeTS-AT, CIS, Hafas</div>
+              <div class="history-subtitle">Ausgelöst durch: <strong>Automatisch (Cron)</strong></div>
             </div>
             <div class="history-stats">
               <span class="stat-chip blue">1.247 Züge</span>
@@ -1583,6 +2061,15 @@
   const discrepancyIndex = new Map();
   const expandedTrainIds = new Set();
   const expandedDayDates = new Set();
+  const dayDateRange = {
+    start: '',
+    end: ''
+  };
+  const dayDateRangeBounds = {
+    start: '',
+    end: ''
+  };
+  let dayDateRangeInitialized = false;
   let archiveRecords = [];
   let trainDataCache = [];
   let dayDataCache = [];
@@ -1693,11 +2180,204 @@
     updateArchiveBadge();
   }
 
+  function formatDateFromIso(dateStr) {
+    if (!dateStr || typeof dateStr !== 'string') return '';
+    const parts = dateStr.split('-');
+    if (parts.length !== 3) return dateStr;
+    const [year, month, day] = parts;
+    return `${day}.${month}.${year}`;
+  }
+
+  function normalizeDateToIso(dateValue) {
+    if (!dateValue || typeof dateValue !== 'string') return '';
+    const trimmed = dateValue.trim();
+    if (!trimmed) return '';
+
+    if (/^\d{4}-\d{2}-\d{2}$/.test(trimmed)) {
+      return trimmed;
+    }
+
+    const dotMatch = trimmed.match(/^(\d{2})\.(\d{2})\.(\d{4})$/);
+    if (dotMatch) {
+      return `${dotMatch[3]}-${dotMatch[2]}-${dotMatch[1]}`;
+    }
+
+    const slashMatch = trimmed.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+    if (slashMatch) {
+      return `${slashMatch[3]}-${slashMatch[2]}-${slashMatch[1]}`;
+    }
+
+    return '';
+  }
+
+  function isDateWithinRange(dateValue, startDate, endDate) {
+    const normalized = normalizeDateToIso(dateValue);
+    if (!normalized) return false;
+    if (startDate && normalized < startDate) return false;
+    if (endDate && normalized > endDate) return false;
+    return true;
+  }
+
+  function updateDayDateRangeLabel() {
+    const label = document.getElementById('dayDateRangeLabel');
+    if (!label) return;
+
+    const start = dayDateRange.start;
+    const end = dayDateRange.end;
+    if (!start || !end) {
+      label.textContent = 'Alle Daten';
+      return;
+    }
+
+    label.textContent = `${formatDateFromIso(start)} – ${formatDateFromIso(end)}`;
+  }
+
+  function closeDayDateRangePopover() {
+    const popover = document.getElementById('dayDateRangePopover');
+    const trigger = document.getElementById('dayDateRangeTrigger');
+    if (popover) popover.classList.remove('open');
+    if (trigger) trigger.setAttribute('aria-expanded', 'false');
+  }
+
+  function openDayDateRangePopover() {
+    const popover = document.getElementById('dayDateRangePopover');
+    const trigger = document.getElementById('dayDateRangeTrigger');
+    const fromInput = document.getElementById('dayDateFrom');
+    const toInput = document.getElementById('dayDateTo');
+    if (!popover || !trigger) return;
+
+    if (fromInput) fromInput.value = dayDateRange.start || '';
+    if (toInput) toInput.value = dayDateRange.end || '';
+
+    popover.classList.add('open');
+    trigger.setAttribute('aria-expanded', 'true');
+  }
+
+  function syncDayDateRangeWithData(days) {
+    if (!Array.isArray(days) || days.length === 0) return;
+
+    const dateValues = days
+      .map(day => normalizeDateToIso(day?.date || ''))
+      .filter(Boolean)
+      .sort();
+
+    if (!dateValues.length) return;
+
+    const minDate = dateValues[0];
+    const maxDate = dateValues[dateValues.length - 1];
+    dayDateRangeBounds.start = minDate;
+    dayDateRangeBounds.end = maxDate;
+
+    if (!dayDateRangeInitialized) {
+      dayDateRange.start = minDate;
+      dayDateRange.end = maxDate;
+      dayDateRangeInitialized = true;
+    } else {
+      if (!dayDateRange.start || dayDateRange.start < minDate) dayDateRange.start = minDate;
+      if (!dayDateRange.end || dayDateRange.end > maxDate) dayDateRange.end = maxDate;
+      if (dayDateRange.start > dayDateRange.end) {
+        dayDateRange.start = minDate;
+        dayDateRange.end = maxDate;
+      }
+    }
+
+    updateDayDateRangeLabel();
+
+    const fromInput = document.getElementById('dayDateFrom');
+    const toInput = document.getElementById('dayDateTo');
+    if (fromInput) {
+      fromInput.min = minDate;
+      fromInput.max = maxDate;
+      fromInput.value = dayDateRange.start;
+    }
+    if (toInput) {
+      toInput.min = minDate;
+      toInput.max = maxDate;
+      toInput.value = dayDateRange.end;
+    }
+  }
+
+  function applyDayDateRangeFilter() {
+    populateDayAccordion(dayDataCache);
+    applyFilters('tage');
+  }
+
+  function initializeDayDateRangeControl() {
+    const control = document.getElementById('dayDateRangeControl');
+    const trigger = document.getElementById('dayDateRangeTrigger');
+    const popover = document.getElementById('dayDateRangePopover');
+    const applyBtn = document.getElementById('dayDateApplyBtn');
+    const resetBtn = document.getElementById('dayDateResetBtn');
+    const fromInput = document.getElementById('dayDateFrom');
+    const toInput = document.getElementById('dayDateTo');
+
+    if (!control || !trigger || !popover || !applyBtn || !resetBtn) return;
+
+    trigger.addEventListener('click', () => {
+      if (popover.classList.contains('open')) {
+        closeDayDateRangePopover();
+      } else {
+        openDayDateRangePopover();
+      }
+    });
+
+    trigger.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        if (popover.classList.contains('open')) {
+          closeDayDateRangePopover();
+        } else {
+          openDayDateRangePopover();
+        }
+      }
+    });
+
+    applyBtn.addEventListener('click', () => {
+      const nextStart = fromInput?.value || '';
+      const nextEnd = toInput?.value || '';
+
+      if (!nextStart || !nextEnd) {
+        showToast('Bitte Start- und Enddatum auswählen.');
+        return;
+      }
+
+      if (nextStart > nextEnd) {
+        showToast('Das Startdatum muss vor dem Enddatum liegen.');
+        return;
+      }
+
+      dayDateRange.start = nextStart;
+      dayDateRange.end = nextEnd;
+      updateDayDateRangeLabel();
+      closeDayDateRangePopover();
+      applyDayDateRangeFilter();
+    });
+
+    resetBtn.addEventListener('click', () => {
+      if (!dayDateRangeBounds.start || !dayDateRangeBounds.end) return;
+      dayDateRange.start = dayDateRangeBounds.start;
+      dayDateRange.end = dayDateRangeBounds.end;
+      if (fromInput) fromInput.value = dayDateRange.start;
+      if (toInput) toInput.value = dayDateRange.end;
+      updateDayDateRangeLabel();
+      closeDayDateRangePopover();
+      applyDayDateRangeFilter();
+    });
+
+    document.addEventListener('click', e => {
+      if (!popover.classList.contains('open')) return;
+      if (!control.contains(e.target)) {
+        closeDayDateRangePopover();
+      }
+    });
+  }
+
   function refreshDiscrepancyPanels() {
     populateTrainAccordion(trainDataCache);
     populateDayAccordion(dayDataCache);
     applyFilters('zuege');
     applyFilters('tage');
+    refreshOpenDiscrepancyStats();
   }
 
   function archiveByKeys(keys) {
@@ -1770,7 +2450,7 @@
       const data = await response.json();
       trainDataCache = data;
       populateTrainAccordion(data);
-      updateStats();
+      refreshOpenDiscrepancyStats();
     } catch (error) {
       console.error('Error loading train discrepancies:', error);
       showListError('zuege-list', `API nicht erreichbar: ${error.message}`);
@@ -1783,21 +2463,47 @@
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       const data = await response.json();
       dayDataCache = data;
+      syncDayDateRangeWithData(data);
       populateDayAccordion(data);
+      applyFilters('tage');
     } catch (error) {
       console.error('Error loading day discrepancies:', error);
       showListError('tage-list', `API nicht erreichbar: ${error.message}`);
     }
   }
 
-  async function updateStats() {
-    try {
-      const response = await fetch(`${API_BASE_URL}/stats`);
-      const stats = await response.json();
-      updatePageStats(stats);
-    } catch (error) {
-      console.error('Error loading stats:', error);
+  function getOpenDiscrepancyStats() {
+    if (!Array.isArray(trainDataCache) || trainDataCache.length === 0) {
+      return {
+        total_discrepancies: 0,
+        affected_trains: 0
+      };
     }
+
+    let totalDiscrepancies = 0;
+    let affectedTrains = 0;
+
+    trainDataCache.forEach(train => {
+      const discrepancies = Array.isArray(train?.discrepancies) ? train.discrepancies : [];
+      const openDiscrepancies = discrepancies.filter(disc => {
+        const key = buildDiscrepancyKey(train?.train_id, disc);
+        return !archivedDiscrepancyKeys.has(key);
+      });
+
+      if (openDiscrepancies.length > 0) {
+        affectedTrains += 1;
+        totalDiscrepancies += openDiscrepancies.length;
+      }
+    });
+
+    return {
+      total_discrepancies: totalDiscrepancies,
+      affected_trains: affectedTrains
+    };
+  }
+
+  function refreshOpenDiscrepancyStats() {
+    updatePageStats(getOpenDiscrepancyStats());
   }
 
   // ---- Populate Train Accordion ----
@@ -1854,7 +2560,7 @@
             </div>
             ${remarksHtml}
             <div class="disc-entry-actions">
-              <button class="btn btn-ghost btn-sm">📋 Details</button>
+              <button class="btn btn-ghost btn-sm" onclick="openModal('${train.train_id}', '${train.route.split(' → ')[0]}', '${train.route.split(' → ')[1]}', '${disc.date}', '${disc.source}', '${stripHtml(disc.text).replace(/'/g, "\\'")}')">📋 Details</button>
               <button class="btn btn-success btn-sm" onclick="markDone(this)">✓ Als bearbeitet markieren</button>
             </div>
           </div>
@@ -1900,7 +2606,9 @@
     const accordionList = document.getElementById('tage-list');
     if (!accordionList) return;
 
-    const visibleDays = days
+    const daysInRange = days.filter(day => isDateWithinRange(day.date, dayDateRange.start, dayDateRange.end));
+
+    const visibleDays = daysInRange
       .map(day => {
         const openTrains = day.trains
           .map(train => {
@@ -1950,6 +2658,8 @@
           const discText = train.discrepancies.map(d => d.text).join('; ');
           const sources = [...new Set(train.discrepancies.map(d => d.source).filter(Boolean))];
           const source = sources.length ? sources.join(', ') : 'Unbekannt';
+          const firstDisc = train.discrepancies[0];
+          const discToShow = firstDisc ? stripHtml(firstDisc.text).replace(/'/g, "\\'") : '';
           return `
             <div class="day-entry-row" data-disc-keys="${keys.join('@@@')}">
               <span class="train-id">${train.train_id}</span>
@@ -1957,6 +2667,7 @@
               <div style="flex:1"></div>
               <span class="day-entry-disc">${discText}</span>
               <span class="source-tag" style="margin-left:10px">${source}</span>
+              <button class="btn btn-ghost btn-sm" style="margin-left:10px" onclick="openModal('${train.train_id}', '${train.route.split(' → ')[0]}', '${train.route.split(' → ')[1]}', '${day.date}', '${source}', '${discToShow}')">📋 Details</button>
               <button class="btn btn-success btn-sm" style="margin-left:10px" onclick="markDayTrainDone(this)">✓ Als bearbeitet markieren</button>
             </div>
           `;
@@ -2029,6 +2740,8 @@
   // Set initial active nav
   document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('nav-zuege').classList.add('active');
+    initializeDayDateRangeControl();
+    updateDayDateRangeLabel();
     restoreArchiveState();
     
     // Load data from API
@@ -2242,11 +2955,48 @@
     // Get search input and source filter for this panel
     const searchInputs = panel.querySelectorAll('.search-input');
     const filterSelects = panel.querySelectorAll('.filter-select');
-    
-    if (searchInputs.length === 0 || filterSelects.length === 0) return;
 
-    const searchValue = searchInputs[0].value.toLowerCase().trim();
+    if (filterSelects.length === 0) return;
+
+    const searchValue = (searchInputs[0]?.value || '').toLowerCase().trim();
     const sourceFilter = filterSelects[0].value; // First select is source filter
+    const dateQuickFilter = filterSelects[1]?.value || 'Datum: Alle';
+
+    function matchesQuickDate(dateValue, quickFilter) {
+      if (!quickFilter || quickFilter === 'Datum: Alle') return true;
+
+      const normalized = normalizeDateToIso(dateValue);
+      if (!normalized) return false;
+
+      const now = new Date();
+      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      const dateObj = new Date(`${normalized}T00:00:00`);
+
+      if (quickFilter === 'Heute') {
+        return dateObj.getTime() === today.getTime();
+      }
+
+      const dayOfWeek = today.getDay();
+      const mondayOffset = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+      const thisWeekStart = new Date(today);
+      thisWeekStart.setDate(today.getDate() + mondayOffset);
+      const thisWeekEnd = new Date(thisWeekStart);
+      thisWeekEnd.setDate(thisWeekStart.getDate() + 6);
+
+      if (quickFilter === 'Diese Woche') {
+        return dateObj >= thisWeekStart && dateObj <= thisWeekEnd;
+      }
+
+      if (quickFilter === 'Nächste Woche') {
+        const nextWeekStart = new Date(thisWeekStart);
+        nextWeekStart.setDate(thisWeekStart.getDate() + 7);
+        const nextWeekEnd = new Date(nextWeekStart);
+        nextWeekEnd.setDate(nextWeekStart.getDate() + 6);
+        return dateObj >= nextWeekStart && dateObj <= nextWeekEnd;
+      }
+
+      return true;
+    }
 
     // For "Züge" panel
     if (panelId === 'zuege') {
@@ -2260,18 +3010,25 @@
                              trainId.includes(searchValue) || 
                              trainRoute.includes(searchValue);
 
-        // Check if entries match source filter
-        let matchesSource = sourceFilter === 'Quelle: Alle';
-        if (!matchesSource) {
-          const entries = item.querySelectorAll('.disc-entry');
-          matchesSource = Array.from(entries).some(entry => {
-            const sourceTag = entry.querySelector('.source-tag')?.textContent.trim();
-            return sourceTag === sourceFilter.split(': ')[1] || sourceTag === sourceFilter;
-          });
-        }
+        // Check if entries match source and date filters
+        const entries = item.querySelectorAll('.disc-entry');
+        const matchingEntries = Array.from(entries).filter(entry => {
+          const sourceTag = entry.querySelector('.source-tag')?.textContent.trim() || '';
+          const entryDate = entry.querySelector('.disc-entry-date')?.textContent.trim() || '';
+
+          const sourceFilterValue = sourceFilter.split(': ')[1] || sourceFilter;
+          const sourceMatch = sourceFilter === 'Quelle: Alle' ||
+            sourceTag === sourceFilterValue;
+
+          const dateMatch = matchesQuickDate(entryDate, dateQuickFilter);
+          entry.style.display = (sourceMatch && dateMatch) ? 'flex' : 'none';
+          return sourceMatch && dateMatch;
+        });
+
+        const matchesSourceAndDate = matchingEntries.length > 0;
 
         // Show/hide accordion item
-        item.style.display = (matchesSearch && matchesSource) ? 'block' : 'none';
+        item.style.display = (matchesSearch && matchesSourceAndDate) ? 'block' : 'none';
       });
     }
     
@@ -2293,8 +3050,8 @@
 
           let matchesSource = sourceFilter === 'Quelle: Alle';
           if (!matchesSource) {
-            const sourceTag = entry.querySelector('.source-tag')?.textContent.trim();
-            matchesSource = sourceTag === sourceFilter.split(': ')[1] || sourceTag === sourceFilter;
+            const sourceTag = entry.querySelector('.source-tag')?.textContent.trim() || '';
+            matchesSource = sourceTag.split(',').map(s => s.trim()).includes(sourceFilter.split(': ')[1] || sourceFilter);
           }
 
           if (matchesSearch && matchesSource) {
@@ -2325,7 +3082,7 @@
 
   // Add event listeners for source filter dropdowns
   document.querySelectorAll('#panel-zuege .filter-select').forEach((select, index) => {
-    if (index === 0) { // Only first select is source filter
+    if (index === 0 || index === 1) { // Source and date quick filter
       select.addEventListener('change', () => {
         applyFilters('zuege');
       });
@@ -2347,7 +3104,265 @@
 
   // ---- Initialize archive badge count ----
   updateArchiveBadge();
+
+  // =========================================
+  // MODAL LOGIC
+  // =========================================
+
+  let currentTrainId = null;
+  let currentTrainDate = null;
+  let currentDiscrepancy = null;
+
+  function openModal(trainId, from, to, date, source, disc) {
+    currentTrainId = trainId;
+    currentTrainDate = date;
+
+    document.getElementById('modalTrainBadge').textContent  = '🚆 ' + trainId;
+    document.getElementById('modalTitle').textContent       = from + ' → ' + to;
+    document.getElementById('modalDate').textContent        = date;
+    document.getElementById('modalSource').textContent      = source;
+    document.getElementById('modalDisc').textContent        = disc;
+    document.getElementById('modalBannerDisc').textContent  = disc;
+    document.getElementById('modalBannerSource').textContent = source;
+
+    // Show loading, hide matrix
+    document.getElementById('matrixLoading').style.display  = 'flex';
+    document.getElementById('matrixContent').style.display  = 'none';
+
+    // Open overlay
+    document.getElementById('detailModal').classList.add('open');
+    document.body.style.overflow = 'hidden';
+
+    // Simulate backend delay
+    const delay = 400 + Math.random() * 500;
+    setTimeout(() => {
+      loadTrainMatrix(trainId, date);
+      document.getElementById('matrixLoading').style.display = 'none';
+      document.getElementById('matrixContent').style.display = 'block';
+    }, delay);
+  }
+
+  function closeModal() {
+    document.getElementById('detailModal').classList.remove('open');
+    document.body.style.overflow = '';
+    currentTrainId = null;
+    currentTrainDate = null;
+  }
+
+  function handleOverlayClick(e) {
+    if (e.target === document.getElementById('detailModal')) {
+      closeModal();
+    }
+  }
+
+  // Close on Escape key
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeModal();
+  });
+
+  function markDoneFromModal() {
+    closeModal();
+    showToast('✓ Eintrag als bearbeitet markiert und ins Archiv verschoben.');
+  }
+
+  // =========================================
+  // MATRIX BUILDER
+  // =========================================
+
+  async function loadTrainMatrix(trainId, date) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/train-details/${trainId}/${date}`);
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+      const data = await response.json();
+      buildMatrix(data);
+    } catch (error) {
+      console.error('Error loading train details:', error);
+      document.getElementById('matrixContent').innerHTML = 
+        `<div style="padding:40px; text-align:center; color:var(--color-text-muted);">
+          ⚠️ Fehler beim Laden der Fahrtweg-Daten: ${error.message}
+        </div>`;
+    }
+  }
+
+  function buildMatrix(trainData) {
+    const table = document.getElementById('matrixTable');
+    table.innerHTML = '';
+
+    const table_body = document.createElement('tbody');
+
+    // ---- ROW 1: Column group headers ----
+    const headRow1 = document.createElement('tr');
+
+    // Route column (rowspan 2)
+    const thRoute = document.createElement('th');
+    thRoute.className = 'col-group-header';
+    thRoute.rowSpan = 2;
+    thRoute.textContent = 'Fahrtweg';
+    thRoute.style.verticalAlign = 'middle';
+    headRow1.appendChild(thRoute);
+
+    const groupDefs = [
+      { label: '💺 Sitzplätze SBB', color: '#2563EB' },
+      { label: '💺 Sitzplätze ÖBB', color: '#7C3AED' },
+      { label: '💺 Sitzplätze DB',  color: '#065F46' },
+      { label: '⚙ Status',           color: '#92400E', span: 1 },
+    ];
+
+    groupDefs.forEach(def => {
+      const th = document.createElement('th');
+      th.className = 'col-group-header';
+      th.colSpan = def.span || 2;
+      th.textContent = def.label;
+      th.style.background = def.color;
+      headRow1.appendChild(th);
+    });
+
+    table.appendChild(headRow1);
+
+    // ---- ROW 2: Sub-headers ----
+    const headRow2 = document.createElement('tr');
+
+    const operators = ['SBB', 'ÖBB', 'DB'];
+    operators.forEach((op, gi) => {
+      const isLast = (gi === operators.length - 1);
+
+      const thArr = document.createElement('th');
+      thArr.className = 'col-sub-header sub-arr';
+      thArr.textContent = 'Ank.';
+      headRow2.appendChild(thArr);
+
+      const thDep = document.createElement('th');
+      thDep.className = 'col-sub-header sub-dep' + (isLast ? ' col-group-border-right' : '');
+      thDep.textContent = 'Abf.';
+      headRow2.appendChild(thDep);
+    });
+
+    // Status header
+    const thStatus = document.createElement('th');
+    thStatus.className = 'col-sub-header';
+    thStatus.textContent = 'Status';
+    headRow2.appendChild(thStatus);
+
+    table.appendChild(headRow2);
+
+    // ---- DATA ROWS ----
+    trainData.stops.forEach((stop, si) => {
+      const tr = document.createElement('tr');
+
+      // Station cell
+      const tdStation = document.createElement('td');
+      tdStation.className = 'station-cell';
+      tdStation.innerHTML = `
+        <div class="station-inner">
+          <div class="station-dot"></div>
+          <div class="station-name-wrap">
+            <div class="station-name">${stop.halt}</div>
+            <div class="station-km">${stop.km}</div>
+          </div>
+        </div>
+      `;
+      tr.appendChild(tdStation);
+
+      // Time columns for each operator
+      operators.forEach((op, gi) => {
+        const isLastOp = (gi === operators.length - 1);
+        const times = stop.operators[op] || {};
+
+        // Arrival
+        const tdArr = document.createElement('td');
+        tdArr.className = 'time-cell';
+        if (times.arrival) {
+          tdArr.innerHTML = `<span class="time-value arr">${times.arrival}</span>`;
+        } else {
+          tdArr.innerHTML = `<span class="time-value empty">–</span>`;
+        }
+        tr.appendChild(tdArr);
+
+        // Departure
+        const tdDep = document.createElement('td');
+        tdDep.className = 'time-cell' + (isLastOp ? ' col-group-border-right' : '');
+        if (times.departure) {
+          tdDep.innerHTML = `<span class="time-value dep">${times.departure}</span>`;
+        } else {
+          tdDep.innerHTML = `<span class="time-value empty">–</span>`;
+        }
+        tr.appendChild(tdDep);
+      });
+
+      // Status column
+      const tdStatus = document.createElement('td');
+      tdStatus.className = 'ares-cell';
+      const status = stop.ares_status || 'OK';
+      let statusClass = 'ares-ok';
+      if (status === '✗ Fehlt') statusClass = 'ares-error';
+      else if (status.includes('⚠')) statusClass = 'ares-warning';
+      tdStatus.innerHTML = `<span class="ares-tag ${statusClass}">${status}</span>`;
+      tr.appendChild(tdStatus);
+
+      table.appendChild(tr);
+    });
+  }
+
 </script>
+
+<!-- ===================== DETAIL MODAL ===================== -->
+<div class="modal-overlay" id="detailModal" onclick="handleOverlayClick(event)">
+  <div class="modal">
+
+    <div class="modal-header">
+      <div class="modal-header-info">
+        <div class="modal-train-badge" id="modalTrainBadge">🚆 IC 723</div>
+        <div class="modal-title" id="modalTitle">Zürich HB → Genève-Aéroport</div>
+        <div class="modal-meta">
+          <div class="modal-meta-item">📅 <strong id="modalDate">24.06.2026</strong></div>
+          <div class="modal-meta-item">⚠️ Quelle: <strong id="modalSource">NeTS-AT</strong></div>
+          <div class="modal-meta-item">🔍 <strong id="modalDisc">Abfahrtszeit weicht um +2 Min ab</strong></div>
+        </div>
+      </div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+
+    <div class="modal-disc-banner">
+      <span class="modal-disc-banner-icon">⚠️</span>
+      <span class="modal-disc-banner-text">
+        Gemeldete Diskrepanz: <strong id="modalBannerDisc"></strong>
+        &nbsp;·&nbsp; Quelle: <strong id="modalBannerSource"></strong>
+      </span>
+    </div>
+
+    <div class="modal-body">
+
+      <!-- Loading state -->
+      <div class="matrix-loading" id="matrixLoading">
+        <div class="matrix-spinner"></div>
+        <div class="matrix-loading-text">Lade Fahrtweg-Daten vom Backend…</div>
+      </div>
+
+      <!-- Matrix (hidden while loading) -->
+      <div id="matrixContent" style="display:none;">
+        <div class="matrix-wrapper">
+          <table class="matrix-table" id="matrixTable"></table>
+        </div>
+        <div class="matrix-legend">
+          <span class="legend-title">Legende:</span>
+          <span class="legend-item"><span class="legend-dot legend-arr"></span> Ankunft</span>
+          <span class="legend-item"><span class="legend-dot legend-dep"></span> Abfahrt</span>
+          <span class="legend-item"><span class="legend-dot legend-disc"></span> Abweichung (Warnung)</span>
+          <span class="legend-item"><span class="legend-dot legend-err"></span> Abweichung (Fehler)</span>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal()">Schliessen</button>
+      <button class="btn btn-success" onclick="markDoneFromModal()">✓ Als bearbeitet markieren</button>
+    </div>
+
+  </div>
+</div>
 
 </body>
 </html>
