@@ -1,0 +1,3 @@
+DB-API:
+  base_url: "https://api.deutschebahn.com/freeplan/v1"
+  
