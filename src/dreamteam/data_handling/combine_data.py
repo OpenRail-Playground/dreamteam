@@ -54,7 +54,7 @@ def combine_data(
     path_fahrplan_zueglaeufe_db: Path,
     path_output_zuege: Path,
     path_output_zueglaeufe: Path,
-    station_name_mapping: Path,
+    path_station_name_mapping: Path,
 ) -> tuple[pd.DataFrame, pd.DataFrame]:
 
     data_ares = pd.read_csv(path_ares, sep=",", encoding="utf-8")
@@ -77,6 +77,10 @@ def combine_data(
     )
     data_fahrplan_zueglaeufe_db = pd.read_csv(
         path_fahrplan_zueglaeufe_db, sep=",", encoding="utf-8"
+    )
+
+    station_name_mapping = pd.read_csv(
+        path_station_name_mapping, sep=",", encoding="utf-8"
     )
 
     data_fahrplan_zueglaeufe_sbb_mapped = apply_station_name_mapping(
