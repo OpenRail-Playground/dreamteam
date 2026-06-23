@@ -83,38 +83,38 @@ def combine_fahrplan_data(
         how="outer",
         on=["zugnummer", "datum"],
         suffixes=("_sbb", "_db"),
-    )  # .merge(
-    #     data_fahrplan_zuege_oebb,
-    #     how="outer",
-    #     on=[
-    #         "zugnummer",
-    #         "datum",
-    #         "abfahrt",
-    #         "ankunft",
-    #         "abfahrtsbahnhof",
-    #         "ankunftsbahnhof",
-    #     ],
-    #     suffixes=("", "_oebb"),
-    # )
+    ).merge(
+        data_fahrplan_zuege_oebb,
+        how="outer",
+        on=[
+            "zugnummer",
+            "datum",
+            "abfahrt",
+            "ankunft",
+            "abfahrtsbahnhof",
+            "ankunftsbahnhof",
+        ],
+        suffixes=("", "_oebb"),
+    )
 
     data_fahrplan_zueglaeufe_joined = data_fahrplan_zueglaeufe_sbb.merge(
         data_fahrplan_zueglaeufe_db,
         how="outer",
         on=["zugnummer", "datum"],
         suffixes=("_sbb", "_db"),
-    )  # .merge(
-    #     data_fahrplan_zueglaeufe_oebb,
-    #     how="outer",
-    #     on=[
-    #         "zugnummer",
-    #         "datum",
-    #         "abfahrt",
-    #         "ankunft",
-    #         "abfahrtsbahnhof",
-    #         "ankunftsbahnhof",
-    #     ],
-    #     suffixes=("", "_oebb"),
-    # )
+    ).merge(
+        data_fahrplan_zueglaeufe_oebb,
+        how="outer",
+        on=[
+            "zugnummer",
+            "datum",
+            "abfahrt",
+            "ankunft",
+            "abfahrtsbahnhof",
+            "ankunftsbahnhof",
+        ],
+        suffixes=("", "_oebb"),
+    )
 
     return (data_fahrplan_zuege_joined, data_fahrplan_zueglaeufe_joined)
 
