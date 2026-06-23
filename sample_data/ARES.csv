@@ -1,1 +1,6 @@
-﻿Version;Datum;Zugnummer
+﻿Gespeichert,Zug,Wagen,Abteile,Plätze/Sektoren,start_date,end_date,start_station,end_station,Bemerkung,Zusatzbemerkung,Grund der Sperre
+04.10.2025 14:20:41,62,23,[],['12'],,, WIEN HBF, WIEN HBF,,"Dauerreservierung Newrest 2026 lt Mail v Eszter v 01.10., 16:12",Reserviert
+04.10.2025 14:27:01,64,23,[],"['11', '12', '18']",,, WIEN HBF, WIEN HBF,,"Dauerreservierung Newrest 2026 lt Mail v Eszter v 01.10., 16:12",Reserviert
+17.06.2026 12:22:52,64,22,"['2', '3', '4', '5', '6', '7', '8', '9', '10', '11']",[],2026-11-20,2026-11-20,WIEN HBF,SALZBURG HBF,Int. 29155,,Kapazitätsverringerung
+23.06.2026 12:00:00,459,[],[],,2026-07-01,2026-07-01,FREIBURG HBF,BADEN-BADEN,"Ausfall","Ausfall Bemerkung", Kapazitätsverringerung
+24.06.2026 12:00:00,459,[],[],,2026-08-01,2026-08-10,FREIBURG HBF,BADEN-BADEN,"Ausfall","Ausfall Bemerkung", Kapazitätsverringerung
