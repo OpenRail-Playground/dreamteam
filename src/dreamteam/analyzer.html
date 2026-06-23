@@ -1,0 +1,2093 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fahrplan-Diskrepanz-Analyzer</title>
+  <style>
+    /* ===========================
+       CSS RESET & VARIABLES
+    =========================== */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --color-primary:       #EB0000;
+      --color-primary-dark:  #CC0000;
+      --color-primary-light: #FFEAEA;
+      --color-bg:            #F5F7FA;
+      --color-surface:       #FFFFFF;
+      --color-border:        #DDE2EA;
+      --color-text:          #1A1A2E;
+      --color-text-muted:    #6B7280;
+      --color-text-light:    #9CA3AF;
+      --color-success:       #16A34A;
+      --color-success-bg:    #DCFCE7;
+      --color-warning:       #D97706;
+      --color-warning-bg:    #FEF3C7;
+      --color-info:          #2563EB;
+      --color-info-bg:       #DBEAFE;
+      --color-sidebar-bg:    #1E2433;
+      --color-sidebar-hover: #2A3347;
+      --color-sidebar-active:#EB0000;
+      --color-sidebar-text:  #C9D1E0;
+      --color-sidebar-head:  #FFFFFF;
+      --header-height:       72px;
+      --sidebar-width:       240px;
+      --radius-sm:           4px;
+      --radius-md:           8px;
+      --radius-lg:           12px;
+      --shadow-sm:           0 1px 3px rgba(0,0,0,0.08);
+      --shadow-md:           0 4px 12px rgba(0,0,0,0.10);
+      --shadow-lg:           0 8px 24px rgba(0,0,0,0.12);
+      --font-sans:           'Segoe UI', system-ui, -apple-system, sans-serif;
+      --transition:          0.18s ease;
+    }
+
+    html, body {
+      height: 100%;
+      font-family: var(--font-sans);
+      font-size: 14px;
+      color: var(--color-text);
+      background: var(--color-bg);
+    }
+
+    /* ===========================
+       APP SHELL
+    =========================== */
+    .app-shell {
+      display: grid;
+      grid-template-rows: var(--header-height) 1fr;
+      grid-template-columns: var(--sidebar-width) 1fr;
+      grid-template-areas:
+        "header header"
+        "sidebar main";
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* ===========================
+       HEADER
+    =========================== */
+    .header {
+      grid-area: header;
+      background: var(--color-surface);
+      border-bottom: 2px solid var(--color-primary);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .header-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .header-logo {
+      width: 44px;
+      height: 44px;
+      background: var(--color-primary);
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      flex-shrink: 0;
+    }
+
+    .header-title {
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--color-text);
+      letter-spacing: -0.2px;
+    }
+
+    .header-subtitle {
+      font-size: 11px;
+      color: var(--color-text-muted);
+      margin-top: 1px;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .dataload-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .dataload-label {
+      font-size: 12px;
+      color: var(--color-text-muted);
+    }
+
+    .dataload-timestamp {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--color-text);
+    }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 9px;
+      border-radius: 99px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .status-pill.fresh {
+      background: var(--color-success-bg);
+      color: var(--color-success);
+    }
+
+    .status-pill.medium {
+      background: var(--color-warning-bg);
+      color: var(--color-warning);
+    }
+
+    .status-pill.stale {
+      background: #F3F4F6;
+      color: var(--color-text-muted);
+    }
+
+    .status-pill::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 14px;
+      border-radius: var(--radius-md);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: background var(--transition), opacity var(--transition), box-shadow var(--transition);
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .btn-primary {
+      background: var(--color-primary);
+      color: #fff;
+    }
+
+    .btn-primary:hover {
+      background: var(--color-primary-dark);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .btn-secondary {
+      background: #F3F4F6;
+      color: var(--color-text);
+      border: 1px solid var(--color-border);
+    }
+
+    .btn-secondary:hover {
+      background: #E9EBF0;
+    }
+
+    .btn-success {
+      background: var(--color-success);
+      color: #fff;
+    }
+
+    .btn-success:hover {
+      background: #15803D;
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--color-info);
+      border: 1px solid var(--color-info);
+    }
+
+    .btn-ghost:hover {
+      background: var(--color-info-bg);
+    }
+
+    .btn:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+
+    .btn-sm {
+      padding: 4px 10px;
+      font-size: 12px;
+    }
+
+    .spinner {
+      width: 14px;
+      height: 14px;
+      border: 2px solid rgba(255,255,255,0.35);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .header-user {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+    }
+
+    .user-avatar {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: var(--color-primary-light);
+      border: 2px solid var(--color-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--color-primary);
+    }
+
+    .user-name {
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    /* ===========================
+       SIDEBAR
+    =========================== */
+    .sidebar {
+      grid-area: sidebar;
+      background: var(--color-sidebar-bg);
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      padding: 16px 0;
+    }
+
+    .nav-section-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #5A6580;
+      padding: 12px 18px 6px;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 18px;
+      color: var(--color-sidebar-text);
+      cursor: pointer;
+      transition: background var(--transition), color var(--transition);
+      border-left: 3px solid transparent;
+      text-decoration: none;
+      font-size: 13.5px;
+      font-weight: 500;
+      position: relative;
+    }
+
+    .nav-item:hover {
+      background: var(--color-sidebar-hover);
+      color: #fff;
+    }
+
+    .nav-item.active {
+      background: rgba(235, 0, 0, 0.15);
+      border-left-color: var(--color-primary);
+      color: #fff;
+    }
+
+    .nav-item .nav-icon {
+      font-size: 16px;
+      width: 20px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+
+    .nav-item .nav-label {
+      flex: 1;
+    }
+
+    .nav-badge {
+      background: var(--color-primary);
+      color: #fff;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 99px;
+      min-width: 22px;
+      text-align: center;
+    }
+
+    .nav-badge.neutral {
+      background: #374151;
+      color: #9CA3AF;
+    }
+
+    .nav-sub-item {
+      padding: 7px 18px 7px 44px;
+      font-size: 13px;
+    }
+
+    .nav-divider {
+      height: 1px;
+      background: #2D3548;
+      margin: 10px 0;
+    }
+
+    .sidebar-footer {
+      margin-top: auto;
+      padding: 16px 18px;
+      font-size: 11px;
+      color: #4A5568;
+    }
+
+    /* ===========================
+       MAIN CONTENT
+    =========================== */
+    .main-content {
+      grid-area: main;
+      overflow-y: auto;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* Panels / Tabs */
+    .panel {
+      display: none;
+    }
+
+    .panel.active {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* Page Header */
+    .page-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .page-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--color-text);
+    }
+
+    .page-desc {
+      font-size: 13px;
+      color: var(--color-text-muted);
+      margin-top: 3px;
+    }
+
+    /* Toolbar */
+    .toolbar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      background: var(--color-surface);
+      padding: 12px 16px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--color-border);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .search-input-wrap {
+      position: relative;
+      flex: 1;
+      min-width: 180px;
+      max-width: 300px;
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 14px;
+      color: var(--color-text-muted);
+      pointer-events: none;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 7px 10px 7px 32px;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      font-size: 13px;
+      color: var(--color-text);
+      background: var(--color-bg);
+      transition: border-color var(--transition), box-shadow var(--transition);
+      outline: none;
+    }
+
+    .search-input:focus {
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 3px rgba(235,0,0,0.10);
+    }
+
+    .filter-select {
+      padding: 7px 28px 7px 10px;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      font-size: 13px;
+      color: var(--color-text);
+      background: var(--color-bg);
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236B7280' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 8px center;
+      cursor: pointer;
+      outline: none;
+      transition: border-color var(--transition);
+    }
+
+    .filter-select:focus {
+      border-color: var(--color-primary);
+    }
+
+    .toolbar-spacer {
+      flex: 1;
+    }
+
+    /* ===========================
+       ACCORDION LIST
+    =========================== */
+    .accordion-list {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .accordion-item {
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .accordion-item:last-child {
+      border-bottom: none;
+    }
+
+    .accordion-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 18px;
+      cursor: pointer;
+      transition: background var(--transition);
+      user-select: none;
+    }
+
+    .accordion-header:hover {
+      background: #FAFBFC;
+    }
+
+    .accordion-header.open {
+      background: #F8F9FC;
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .accordion-checkbox {
+      width: 16px;
+      height: 16px;
+      cursor: pointer;
+      accent-color: var(--color-primary);
+      flex-shrink: 0;
+    }
+
+    .accordion-meta {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .train-id {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--color-text);
+      min-width: 65px;
+    }
+
+    .train-route {
+      font-size: 13px;
+      color: var(--color-text-muted);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .route-arrow {
+      color: var(--color-text-light);
+      font-size: 11px;
+    }
+
+    .disc-badge {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .disc-count {
+      background: var(--color-primary-light);
+      color: var(--color-primary);
+      font-size: 12px;
+      font-weight: 700;
+      padding: 2px 9px;
+      border-radius: 99px;
+    }
+
+    .disc-count.single {
+      background: #FEF3C7;
+      color: #B45309;
+    }
+
+    .disc-count.many {
+      background: #FEE2E2;
+      color: #DC2626;
+    }
+
+    .accordion-toggle {
+      font-size: 11px;
+      color: var(--color-text-muted);
+      transition: transform var(--transition);
+      padding: 2px 4px;
+    }
+
+    .accordion-toggle.open {
+      transform: rotate(90deg);
+    }
+
+    .accordion-body {
+      display: none;
+      padding: 0 18px 16px 48px;
+      background: #F8F9FC;
+    }
+
+    .accordion-body.open {
+      display: block;
+    }
+
+    /* Nested item */
+    .disc-entry {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: 14px 16px;
+      margin-top: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .disc-entry-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .disc-entry-date {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--color-text-muted);
+    }
+
+    .source-tag {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 8px;
+      border-radius: var(--radius-sm);
+      font-size: 11px;
+      font-weight: 600;
+      background: var(--color-info-bg);
+      color: var(--color-info);
+    }
+
+    .disc-entry-text {
+      font-size: 13px;
+      color: var(--color-text);
+      line-height: 1.5;
+    }
+
+    .disc-entry-text strong {
+      color: var(--color-primary);
+    }
+
+    .disc-entry-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding-top: 4px;
+    }
+
+    /* Day items (Modul B) */
+    .day-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .day-label {
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .day-count {
+      font-size: 12px;
+      color: var(--color-text-muted);
+      font-weight: 500;
+    }
+
+    .day-trains-badge {
+      background: var(--color-info-bg);
+      color: var(--color-info);
+      font-size: 12px;
+      font-weight: 700;
+      padding: 2px 9px;
+      border-radius: 99px;
+      margin-left: auto;
+    }
+
+    .day-entry {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      margin-top: 10px;
+      overflow: hidden;
+    }
+
+    .day-entry-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 11px 14px;
+      border-bottom: 1px solid #F0F2F7;
+    }
+
+    .day-entry-row:last-child {
+      border-bottom: none;
+    }
+
+    .day-entry-row .train-id {
+      min-width: 70px;
+    }
+
+    .day-entry-disc {
+      font-size: 12.5px;
+      color: var(--color-text-muted);
+      flex: 1;
+    }
+
+    /* ===========================
+       BULK ACTION BAR
+    =========================== */
+    .bulk-bar {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: 12px 18px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .bulk-bar.hidden {
+      display: none;
+    }
+
+    .bulk-info {
+      font-size: 13px;
+      color: var(--color-text-muted);
+    }
+
+    .bulk-info strong {
+      color: var(--color-text);
+    }
+
+    /* ===========================
+       ARCHIVE MODULE
+    =========================== */
+    .archive-toggle {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      background: #F3F4F6;
+      border-radius: var(--radius-md);
+      padding: 3px;
+      border: 1px solid var(--color-border);
+    }
+
+    .archive-toggle-btn {
+      padding: 6px 16px;
+      border-radius: calc(var(--radius-md) - 2px);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background var(--transition), color var(--transition);
+      border: none;
+      background: transparent;
+      color: var(--color-text-muted);
+    }
+
+    .archive-toggle-btn.active {
+      background: var(--color-surface);
+      color: var(--color-text);
+      font-weight: 700;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .archive-entry {
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      background: var(--color-surface);
+    }
+
+    .archive-entry-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 13px 16px;
+      cursor: pointer;
+      background: var(--color-surface);
+      transition: background var(--transition);
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .archive-entry-header:hover {
+      background: #FAFBFC;
+    }
+
+    .archive-meta {
+      flex: 1;
+    }
+
+    .archive-train {
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .archive-route {
+      font-size: 12.5px;
+      color: var(--color-text-muted);
+    }
+
+    .archive-timestamp {
+      font-size: 11.5px;
+      color: var(--color-text-muted);
+    }
+
+    .archive-badge {
+      background: var(--color-success-bg);
+      color: var(--color-success);
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 9px;
+      border-radius: 99px;
+    }
+
+    .archive-body {
+      padding: 14px 16px;
+      background: #F8F9FC;
+      display: none;
+    }
+
+    .archive-body.open {
+      display: block;
+    }
+
+    .archive-detail {
+      font-size: 13px;
+      line-height: 1.6;
+      color: var(--color-text);
+    }
+
+    .archive-detail .audit-line {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 8px;
+      font-size: 12px;
+      color: var(--color-success);
+      font-weight: 600;
+    }
+
+    .archive-actions {
+      margin-top: 10px;
+      display: flex;
+      gap: 8px;
+    }
+
+    /* ===========================
+       HISTORY MODULE
+    =========================== */
+    .history-item {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .history-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 14px 18px;
+      cursor: pointer;
+      transition: background var(--transition);
+    }
+
+    .history-header:hover {
+      background: #FAFBFC;
+    }
+
+    .history-icon {
+      font-size: 22px;
+    }
+
+    .history-meta {
+      flex: 1;
+    }
+
+    .history-title {
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .history-subtitle {
+      font-size: 12px;
+      color: var(--color-text-muted);
+      margin-top: 2px;
+    }
+
+    .history-stats {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .stat-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 10px;
+      border-radius: 99px;
+      font-size: 11.5px;
+      font-weight: 600;
+    }
+
+    .stat-chip.blue {
+      background: var(--color-info-bg);
+      color: var(--color-info);
+    }
+
+    .stat-chip.red {
+      background: #FEE2E2;
+      color: #DC2626;
+    }
+
+    .history-toggle {
+      font-size: 11px;
+      color: var(--color-text-muted);
+      transition: transform var(--transition);
+    }
+
+    .history-toggle.open {
+      transform: rotate(90deg);
+    }
+
+    .history-body {
+      display: none;
+      padding: 0 18px 18px;
+      border-top: 1px solid var(--color-border);
+      background: #FAFBFC;
+    }
+
+    .history-body.open {
+      display: block;
+    }
+
+    .history-section {
+      margin-top: 14px;
+    }
+
+    .history-section-title {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--color-text-muted);
+      margin-bottom: 8px;
+    }
+
+    .history-info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 10px;
+    }
+
+    .history-info-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: 10px 14px;
+    }
+
+    .history-info-card .info-label {
+      font-size: 11px;
+      color: var(--color-text-muted);
+      font-weight: 600;
+    }
+
+    .history-info-card .info-value {
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--color-text);
+      margin-top: 2px;
+    }
+
+    .history-info-card .info-value.red {
+      color: var(--color-primary);
+    }
+
+    .history-info-card .info-value.green {
+      color: var(--color-success);
+    }
+
+    /* Data Table */
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      background: var(--color-surface);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      border: 1px solid var(--color-border);
+      margin-top: 8px;
+    }
+
+    .data-table th {
+      background: #F3F4F6;
+      padding: 9px 14px;
+      text-align: left;
+      font-size: 11.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--color-text-muted);
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .data-table td {
+      padding: 10px 14px;
+      border-bottom: 1px solid #F0F2F7;
+      color: var(--color-text);
+    }
+
+    .data-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .data-table tr:hover td {
+      background: #F8F9FC;
+    }
+
+    .data-table .num {
+      font-variant-numeric: tabular-nums;
+      text-align: right;
+    }
+
+    /* Source Tags */
+    .tag {
+      display: inline-flex;
+      padding: 2px 7px;
+      border-radius: var(--radius-sm);
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .tag-nets {
+      background: #EDE9FE;
+      color: #7C3AED;
+    }
+
+    .tag-cis {
+      background: var(--color-info-bg);
+      color: var(--color-info);
+    }
+
+    .tag-hafas {
+      background: #DCFCE7;
+      color: #166534;
+    }
+
+    /* ===========================
+       DATE RANGE PICKER (styled)
+    =========================== */
+    .date-range-wrap {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--color-bg);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: 6px 12px;
+      font-size: 13px;
+      cursor: pointer;
+    }
+
+    .date-range-wrap:hover {
+      border-color: var(--color-primary);
+    }
+
+    /* ===========================
+       TOAST NOTIFICATION
+    =========================== */
+    .toast-container {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      z-index: 9999;
+    }
+
+    .toast {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: #1E2433;
+      color: #fff;
+      padding: 12px 18px;
+      border-radius: var(--radius-md);
+      font-size: 13px;
+      box-shadow: var(--shadow-lg);
+      animation: slideIn 0.25s ease;
+      min-width: 280px;
+    }
+
+    .toast .toast-undo {
+      margin-left: auto;
+      color: #93C5FD;
+      font-weight: 700;
+      cursor: pointer;
+      font-size: 12px;
+      text-decoration: underline;
+    }
+
+    @keyframes slideIn {
+      from { transform: translateX(30px); opacity: 0; }
+      to   { transform: translateX(0);    opacity: 1; }
+    }
+
+    /* ===========================
+       EMPTY STATE
+    =========================== */
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 48px 24px;
+      color: var(--color-text-muted);
+      gap: 10px;
+    }
+
+    .empty-state .empty-icon {
+      font-size: 40px;
+    }
+
+    .empty-state .empty-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--color-text);
+    }
+
+    .empty-state .empty-desc {
+      font-size: 13px;
+      text-align: center;
+      max-width: 280px;
+    }
+
+    /* ===========================
+       SCROLLBAR
+    =========================== */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #CBD5E1;
+      border-radius: 99px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94A3B8;
+    }
+
+    /* ===========================
+       UTILITY
+    =========================== */
+    .flex {
+      display: flex;
+    }
+
+    .items-center {
+      align-items: center;
+    }
+
+    .gap-8 {
+      gap: 8px;
+    }
+
+    .gap-12 {
+      gap: 12px;
+    }
+
+    .mt-12 {
+      margin-top: 12px;
+    }
+
+    .text-muted {
+      color: var(--color-text-muted);
+    }
+
+    .text-sm {
+      font-size: 12px;
+    }
+
+    .font-bold {
+      font-weight: 700;
+    }
+
+    .separator {
+      color: var(--color-text-light);
+      margin: 0 4px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="app-shell">
+
+  <!-- ===================== HEADER ===================== -->
+  <header class="header">
+    <div class="header-brand">
+      <div class="header-logo">🚆</div>
+      <div>
+        <div class="header-title">Fahrplan-Diskrepanz-Analyzer</div>
+        <div class="header-subtitle">Vergleich: NeTS-AT · CIS · Hafas</div>
+      </div>
+    </div>
+
+    <div class="header-right">
+      <div class="dataload-info">
+        <span class="dataload-label">Letzter Dataload:</span>
+        <span class="dataload-timestamp">23.06.2026, 11:42</span>
+        <span class="status-pill fresh">frisch</span>
+      </div>
+
+      <button class="btn btn-primary" id="dataloadBtn" onclick="triggerDataload()">
+        🔄 Neuen Dataload anfordern
+      </button>
+
+      <div class="header-user">
+        <div class="user-avatar">MM</div>
+        <span class="user-name">M. Müller</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===================== SIDEBAR ===================== -->
+  <aside class="sidebar">
+    <span class="nav-section-label">Diskrepanzen</span>
+
+    <a class="nav-item" onclick="switchPanel('zuege')" id="nav-zuege">
+      <span class="nav-icon">🔍</span>
+      <span class="nav-label">Pro Zug</span>
+      <span class="nav-badge">42</span>
+    </a>
+
+    <a class="nav-item" onclick="switchPanel('tage')" id="nav-tage">
+      <span class="nav-icon">📅</span>
+      <span class="nav-label">Pro Tag</span>
+      <span class="nav-badge">12</span>
+    </a>
+
+    <div class="nav-divider"></div>
+
+    <span class="nav-section-label">Abgeschlossen</span>
+
+    <a class="nav-item" onclick="switchPanel('archiv')" id="nav-archiv">
+      <span class="nav-icon">✅</span>
+      <span class="nav-label">Archiv</span>
+      <span class="nav-badge neutral">128</span>
+    </a>
+
+    <div class="nav-divider"></div>
+
+    <span class="nav-section-label">System</span>
+
+    <a class="nav-item" onclick="switchPanel('history')" id="nav-history">
+      <span class="nav-icon">🕓</span>
+      <span class="nav-label">Dataload-Historie</span>
+    </a>
+
+    <div class="sidebar-footer">
+      v2.4.1 · © 2026 SBB
+    </div>
+  </aside>
+
+  <!-- ===================== MAIN CONTENT ===================== -->
+  <main class="main-content">
+
+    <!-- ============ PANEL: ZÜGE ============ -->
+    <section class="panel active" id="panel-zuege">
+
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Diskrepanzen pro Zug</h1>
+          <p class="page-desc">42 offene Diskrepanzen in 18 Zügen</p>
+        </div>
+      </div>
+
+      <!-- Toolbar -->
+      <div class="toolbar">
+        <div class="search-input-wrap">
+          <span class="search-icon">🔍</span>
+          <input class="search-input" type="text" placeholder="Suche: Zugnummer, Strecke…" />
+        </div>
+
+        <select class="filter-select">
+          <option>Quelle: Alle</option>
+          <option>NeTS-AT</option>
+          <option>CIS</option>
+          <option>Hafas</option>
+        </select>
+
+        <select class="filter-select">
+          <option>Datum: Alle</option>
+          <option>Heute</option>
+          <option>Diese Woche</option>
+          <option>Nächste Woche</option>
+        </select>
+
+        <div class="toolbar-spacer"></div>
+
+        <button class="btn btn-secondary">
+          ↕ Sortieren
+        </button>
+      </div>
+
+      <!-- Accordion List -->
+      <div class="accordion-list">
+
+        <!-- Item 1: IC 723 -->
+        <div class="accordion-item">
+          <div class="accordion-header" onclick="toggleAccordion(this)">
+            <input type="checkbox" class="accordion-checkbox" onclick="event.stopPropagation()" />
+            <div class="accordion-meta">
+              <span class="train-id">IC 723</span>
+              <span class="train-route">
+                Zürich HB
+                <span class="route-arrow">→</span>
+                Genève-Aéroport
+              </span>
+              <span class="disc-badge">
+                <span class="disc-count many">3 Diskrepanzen</span>
+              </span>
+            </div>
+            <span class="accordion-toggle">▶</span>
+          </div>
+          <div class="accordion-body">
+            <!-- Entry 1 -->
+            <div class="disc-entry">
+              <div class="disc-entry-header">
+                <input type="checkbox" class="accordion-checkbox" />
+                <span class="disc-entry-date">24.06.2026</span>
+                <span class="source-tag">NeTS-AT</span>
+              </div>
+              <div class="disc-entry-text">
+                <strong>Abfahrtszeit</strong> weicht um <strong>+2 Min</strong> ab gegenüber CIS und Hafas.
+              </div>
+              <div class="disc-entry-actions">
+                <button class="btn btn-ghost btn-sm">📋 Details</button>
+                <button class="btn btn-success btn-sm" onclick="markDone(this)">✓ Als bearbeitet markieren</button>
+              </div>
+            </div>
+            <!-- Entry 2 -->
+            <div class="disc-entry">
+              <div class="disc-entry-header">
+                <input type="checkbox" class="accordion-checkbox" />
+                <span class="disc-entry-date">25.06.2026</span>
+                <span class="source-tag">CIS</span>
+              </div>
+              <div class="disc-entry-text">
+                Halt <strong>Bern</strong> fehlt in CIS, vorhanden in NeTS-AT und Hafas.
+              </div>
+              <div class="disc-entry-actions">
+                <button class="btn btn-ghost btn-sm">📋 Details</button>
+                <button class="btn btn-success btn-sm" onclick="markDone(this)">✓ Als bearbeitet markieren</button>
+              </div>
+            </div>
+            <!-- Entry 3 -->
+            <div class="disc-entry">
+              <div class="disc-entry-header">
+                <input type="checkbox" class="accordion-checkbox" />
+                <span class="disc-entry-date">26.06.2026</span>
+                <span class="source-tag">Hafas</span>
+              </div>
+              <div class="disc-entry-text">
+                Ankunftszeit in <strong>Genève-Aéroport</strong> weicht um <strong>−1 Min</strong> ab gegenüber NeTS-AT.
+              </div>
+              <div class="disc-entry-actions">
+                <button class="btn btn-ghost btn-sm">📋 Details</button>
+                <button class="btn btn-success btn-sm" onclick="markDone(this)">✓ Als bearbeitet markieren</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Item 2: IR 1567 -->
+        <div class="accordion-item">
+          <div class="accordion-header open" onclick="toggleAccordion(this)">
+            <input type="checkbox" class="accordion-checkbox" onclick="event.stopPropagation()" />
+            <div class="accordion-meta">
+              <span class="train-id">IR 1567</span>
+              <span class="train-route">
+                Basel SBB
+                <span class="route-arrow">→</span>
+                Locarno
+              </span>
+              <span class="disc-badge">
+                <span class="disc-count single">1 Diskrepanz</span>
+              </span>
+            </div>
+            <span class="accordion-toggle open">▶</span>
+          </div>
+          <div class="accordion-body open">
+            <div class="disc-entry">
+              <div class="disc-entry-header">
+                <input type="checkbox" class="accordion-checkbox" />
+                <span class="disc-entry-date">24.06.2026</span>
+                <span class="source-tag">NeTS-AT</span>
+              </div>
+              <div class="disc-entry-text">
+                <strong>Abfahrtszeit</strong> weicht um <strong>+2 Min</strong> ab gegenüber CIS und Hafas.
+              </div>
+              <div class="disc-entry-actions">
+                <button class="btn btn-ghost btn-sm">📋 Details</button>
+                <button class="btn btn-success btn-sm" onclick="markDone(this)">✓ Als bearbeitet markieren</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Item 3: IC 921 -->
+        <div class="accordion-item">
+          <div class="accordion-header" onclick="toggleAccordion(this)">
+            <input type="checkbox" class="accordion-checkbox" onclick="event.stopPropagation()" />
+            <div class="accordion-meta">
+              <span class="train-id">IC 921</span>
+              <span class="train-route">
+                Brig
+                <span class="route-arrow">→</span>
+                Romanshorn
+              </span>
+              <span class="disc-badge">
+                <span class="disc-count many">5 Diskrepanzen</span>
+              </span>
+            </div>
+            <span class="accordion-toggle">▶</span>
+          </div>
+          <div class="accordion-body">
+            <div class="disc-entry">
+              <div class="disc-entry-header">
+                <input type="checkbox" class="accordion-checkbox" />
+                <span class="disc-entry-date">23.06.2026</span>
+                <span class="source-tag">CIS</span>
+              </div>
+              <div class="disc-entry-text">
+                Zusatzhalt <strong>Spiez</strong> in Hafas nicht vorhanden. Mögliche Planungsabweichung.
+              </div>
+              <div class="disc-entry-actions">
+                <button class="btn btn-ghost btn-sm">📋 Details</button>
+                <button class="btn btn-success btn-sm" onclick="markDone(this)">✓ Als bearbeitet markieren</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Item 4: RE 3291 -->
+        <div class="accordion-item">
+          <div class="accordion-header" onclick="toggleAccordion(this)">
+            <input type="checkbox" class="accordion-checkbox" onclick="event.stopPropagation()" />
+            <div class="accordion-meta">
+              <span class="train-id">RE 3291</span>
+              <span class="train-route">
+                Luzern
+                <span class="route-arrow">→</span>
+                Olten
+              </span>
+              <span class="disc-badge">
+                <span class="disc-count">2 Diskrepanzen</span>
+              </span>
+            </div>
+            <span class="accordion-toggle">▶</span>
+          </div>
+          <div class="accordion-body">
+            <div class="disc-entry">
+              <div class="disc-entry-header">
+                <input type="checkbox" class="accordion-checkbox" />
+                <span class="disc-entry-date">27.06.2026</span>
+                <span class="source-tag">Hafas</span>
+              </div>
+              <div class="disc-entry-text">
+                Fahrtrichtungswechsel in <strong>Zofingen</strong> nicht in NeTS-AT erfasst.
+              </div>
+              <div class="disc-entry-actions">
+                <button class="btn btn-ghost btn-sm">📋 Details</button>
+                <button class="btn btn-success btn-sm" onclick="markDone(this)">✓ Als bearbeitet markieren</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /accordion-list -->
+
+      <!-- Bulk Action Bar -->
+      <div class="bulk-bar" id="bulkBar">
+        <span class="bulk-info">
+          Auswahl: <strong>2 Züge / 4 Einträge</strong>
+        </span>
+        <div class="toolbar-spacer"></div>
+        <button class="btn btn-success" onclick="showToast()">
+          ✓ Markierte ins Archiv verschieben
+        </button>
+        <button class="btn btn-secondary" onclick="document.getElementById('bulkBar').classList.add('hidden')">
+          Auswahl aufheben
+        </button>
+      </div>
+
+    </section><!-- /panel-zuege -->
+
+
+    <!-- ============ PANEL: TAGE ============ -->
+    <section class="panel" id="panel-tage">
+
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Diskrepanzen pro Tag</h1>
+          <p class="page-desc">Zeitraum: 20.06.–30.06.2026 · 12 Tage mit Diskrepanzen</p>
+        </div>
+      </div>
+
+      <!-- Toolbar -->
+      <div class="toolbar">
+        <span style="font-size:15px">📅</span>
+        <div class="date-range-wrap">
+          📅 20.06.2026 – 30.06.2026 ▾
+        </div>
+
+        <select class="filter-select">
+          <option>Quelle: Alle</option>
+          <option>NeTS-AT</option>
+          <option>CIS</option>
+          <option>Hafas</option>
+        </select>
+
+        <div class="toolbar-spacer"></div>
+
+        <button class="btn btn-secondary">
+          ↕ Sortieren
+        </button>
+      </div>
+
+      <!-- Day Accordion -->
+      <div class="accordion-list">
+
+        <!-- Mo 24.06 -->
+        <div class="accordion-item">
+          <div class="accordion-header open" onclick="toggleAccordion(this)">
+            <input type="checkbox" class="accordion-checkbox" onclick="event.stopPropagation()" />
+            <div class="accordion-meta">
+              <div class="day-header">
+                <span class="day-label">Mo, 24.06.2026</span>
+              </div>
+              <span class="disc-badge">
+                <span class="day-trains-badge">12 Züge betroffen</span>
+              </span>
+            </div>
+            <span class="accordion-toggle open">▶</span>
+          </div>
+          <div class="accordion-body open">
+            <div class="day-entry">
+              <div class="day-entry-row">
+                <input type="checkbox" class="accordion-checkbox" />
+                <span class="train-id">IR 1567</span>
+                <span class="train-route">Basel SBB <span class="route-arrow">→</span> Locarno</span>
+                <div style="flex:1"></div>
+                <span class="day-entry-disc">Abfahrtszeit weicht +2 Min ab</span>
+                <span class="source-tag" style="margin-left:10px">NeTS-AT</span>
+              </div>
+              <div class="day-entry-row">
+                <input type="checkbox" class="accordion-checkbox" />
+                <span class="train-id">IC 723</span>
+                <span class="train-route">Zürich HB <span class="route-arrow">→</span> Genève-Aéroport</span>
+                <div style="flex:1"></div>
+                <span class="day-entry-disc">Halt in Bern fehlt</span>
+                <span class="source-tag" style="margin-left:10px">CIS</span>
+              </div>
+              <div class="day-entry-row">
+                <input type="checkbox" class="accordion-checkbox" />
+                <span class="train-id">EC 195</span>
+                <span class="train-route">Zürich HB <span class="route-arrow">→</span> Milano Centrale</span>
+                <div style="flex:1"></div>
+                <span class="day-entry-disc">Ankunft weicht −3 Min ab</span>
+                <span class="source-tag" style="margin-left:10px">Hafas</span>
+              </div>
+              <div class="day-entry-row" style="color: var(--color-text-muted); font-size:12.5px; padding-left:44px">
+                … weitere 9 Züge nicht angezeigt
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Di 25.06 -->
+        <div class="accordion-item">
+          <div class="accordion-header" onclick="toggleAccordion(this)">
+            <input type="checkbox" class="accordion-checkbox" onclick="event.stopPropagation()" />
+            <div class="accordion-meta">
+              <div class="day-header">
+                <span class="day-label">Di, 25.06.2026</span>
+              </div>
+              <span class="disc-badge">
+                <span class="day-trains-badge">3 Züge betroffen</span>
+              </span>
+            </div>
+            <span class="accordion-toggle">▶</span>
+          </div>
+          <div class="accordion-body">
+            <div class="day-entry">
+              <div class="day-entry-row">
+                <input type="checkbox" class="accordion-checkbox" />
+                <span class="train-id">IC 921</span>
+                <span class="train-route">Brig <span class="route-arrow">→</span> Romanshorn</span>
+                <div style="flex:1"></div>
+                <span class="day-entry-disc">Zusatzhalt Spiez fehlt in Hafas</span>
+                <span class="source-tag" style="margin-left:10px">CIS</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Mi 26.06 -->
+        <div class="accordion-item">
+          <div class="accordion-header" onclick="toggleAccordion(this)">
+            <input type="checkbox" class="accordion-checkbox" onclick="event.stopPropagation()" />
+            <div class="accordion-meta">
+              <div class="day-header">
+                <span class="day-label">Mi, 26.06.2026</span>
+              </div>
+              <span class="disc-badge">
+                <span class="day-trains-badge">7 Züge betroffen</span>
+              </span>
+            </div>
+            <span class="accordion-toggle">▶</span>
+          </div>
+          <div class="accordion-body">
+            <div class="day-entry">
+              <div class="day-entry-row">
+                <input type="checkbox" class="accordion-checkbox" />
+                <span class="train-id">RE 3291</span>
+                <span class="train-route">Luzern <span class="route-arrow">→</span> Olten</span>
+                <div style="flex:1"></div>
+                <span class="day-entry-disc">Fahrtrichtungswechsel fehlt</span>
+                <span class="source-tag" style="margin-left:10px">Hafas</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Bulk Bar -->
+      <div class="bulk-bar">
+        <span class="bulk-info">
+          Auswahl: <strong>0 Einträge</strong>
+        </span>
+        <div class="toolbar-spacer"></div>
+        <button class="btn btn-success" onclick="showToast()">
+          ✓ Markierte ins Archiv verschieben
+        </button>
+      </div>
+
+    </section><!-- /panel-tage -->
+
+
+    <!-- ============ PANEL: ARCHIV ============ -->
+    <section class="panel" id="panel-archiv">
+
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Archiv – Bearbeitete Fälle</h1>
+          <p class="page-desc">128 abgeschlossene Einträge</p>
+        </div>
+      </div>
+
+      <!-- View Toggle -->
+      <div class="toolbar">
+        <div class="archive-toggle">
+          <button class="archive-toggle-btn active">Pro Zug</button>
+          <button class="archive-toggle-btn">Pro Tag</button>
+        </div>
+
+        <div class="search-input-wrap">
+          <span class="search-icon">🔍</span>
+          <input class="search-input" type="text" placeholder="Suche…" />
+        </div>
+
+        <select class="filter-select">
+          <option>Bearbeitet von: Alle</option>
+          <option>M. Müller</option>
+          <option>S. Keller</option>
+          <option>T. Baumann</option>
+        </select>
+
+        <select class="filter-select">
+          <option>Zeitraum: Alle</option>
+          <option>Heute</option>
+          <option>Diese Woche</option>
+          <option>Letzter Monat</option>
+        </select>
+      </div>
+
+      <!-- Archive Entries -->
+      <div style="display:flex; flex-direction:column; gap:8px;">
+
+        <div class="archive-entry">
+          <div class="archive-entry-header" onclick="toggleArchive(this)">
+            <div class="archive-meta">
+              <div class="archive-train">IC 723 <span class="text-muted font-bold separator">·</span>
+                <span style="font-weight:400; font-size:13px">Zürich HB → Genève-Aéroport</span>
+              </div>
+              <div class="archive-route">bearbeitet: 22.06.2026, 14:33 Uhr</div>
+            </div>
+            <span class="archive-badge">✓ Erledigt</span>
+            <span class="accordion-toggle" style="margin-left:12px">▶</span>
+          </div>
+          <div class="archive-body">
+            <div class="archive-detail">
+              <div><strong>Datum:</strong> 24.06.2026 &nbsp;|&nbsp; <strong>Quelle:</strong> <span class="source-tag">NeTS-AT</span></div>
+              <div style="margin-top:6px"><strong>Diskrepanz:</strong> Abfahrtszeit weicht um +2 Min ab gegenüber CIS und Hafas.</div>
+              <div class="audit-line">
+                ✓ Bearbeitet von <strong>M. Müller</strong> am 22.06.2026, 14:33 Uhr
+              </div>
+            </div>
+            <div class="archive-actions">
+              <button class="btn btn-secondary btn-sm">↩ Wiederherstellen</button>
+              <button class="btn btn-ghost btn-sm">📋 Details anzeigen</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="archive-entry">
+          <div class="archive-entry-header" onclick="toggleArchive(this)">
+            <div class="archive-meta">
+              <div class="archive-train">IR 2044 <span class="text-muted font-bold separator">·</span>
+                <span style="font-weight:400; font-size:13px">St. Gallen → Bern</span>
+              </div>
+              <div class="archive-route">bearbeitet: 21.06.2026, 09:15 Uhr</div>
+            </div>
+            <span class="archive-badge">✓ Erledigt</span>
+            <span class="accordion-toggle" style="margin-left:12px">▶</span>
+          </div>
+          <div class="archive-body">
+            <div class="archive-detail">
+              <div><strong>Datum:</strong> 22.06.2026 &nbsp;|&nbsp; <strong>Quelle:</strong> <span class="source-tag">CIS</span></div>
+              <div style="margin-top:6px"><strong>Diskrepanz:</strong> Halt Winterthur in CIS als fakultativ markiert, in Hafas als regulär.</div>
+              <div class="audit-line">
+                ✓ Bearbeitet von <strong>S. Keller</strong> am 21.06.2026, 09:15 Uhr
+              </div>
+            </div>
+            <div class="archive-actions">
+              <button class="btn btn-secondary btn-sm">↩ Wiederherstellen</button>
+              <button class="btn btn-ghost btn-sm">📋 Details anzeigen</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="archive-entry">
+          <div class="archive-entry-header" onclick="toggleArchive(this)">
+            <div class="archive-meta">
+              <div class="archive-train">EC 195 <span class="text-muted font-bold separator">·</span>
+                <span style="font-weight:400; font-size:13px">Zürich HB → Milano Centrale</span>
+              </div>
+              <div class="archive-route">bearbeitet: 20.06.2026, 16:48 Uhr</div>
+            </div>
+            <span class="archive-badge">✓ Erledigt</span>
+            <span class="accordion-toggle" style="margin-left:12px">▶</span>
+          </div>
+          <div class="archive-body">
+            <div class="archive-detail">
+              <div><strong>Datum:</strong> 20.06.2026 &nbsp;|&nbsp; <strong>Quelle:</strong> <span class="source-tag">Hafas</span></div>
+              <div style="margin-top:6px"><strong>Diskrepanz:</strong> Ankunftszeit in Chiasso weicht um −3 Min ab gegenüber NeTS-AT und CIS.</div>
+              <div class="audit-line">
+                ✓ Bearbeitet von <strong>T. Baumann</strong> am 20.06.2026, 16:48 Uhr
+              </div>
+            </div>
+            <div class="archive-actions">
+              <button class="btn btn-secondary btn-sm">↩ Wiederherstellen</button>
+              <button class="btn btn-ghost btn-sm">📋 Details anzeigen</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </section><!-- /panel-archiv -->
+
+
+    <!-- ============ PANEL: HISTORY ============ -->
+    <section class="panel" id="panel-history">
+
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Dataload-Historie</h1>
+          <p class="page-desc">Alle ausgeführten Dataloads mit Statistiken</p>
+        </div>
+      </div>
+
+      <div style="display:flex; flex-direction:column; gap:12px;">
+
+        <!-- Dataload #2451 -->
+        <div class="history-item">
+          <div class="history-header" onclick="toggleHistory(this)">
+            <span class="history-icon">📦</span>
+            <div class="history-meta">
+              <div class="history-title">Dataload #2451 — 23.06.2026, 11:42:17</div>
+              <div class="history-subtitle">Ausgelöst durch: <strong>Automatisch (Cron)</strong> &nbsp;·&nbsp; Datenquellen: NeTS-AT, CIS, Hafas</div>
+            </div>
+            <div class="history-stats">
+              <span class="stat-chip blue">1.247 Züge</span>
+              <span class="stat-chip red">54 Diskrepanzen</span>
+            </div>
+            <span class="history-toggle" style="margin-left:12px">▶</span>
+          </div>
+          <div class="history-body">
+
+            <div class="history-section">
+              <div class="history-section-title">Zusammenfassung</div>
+              <div class="history-info-grid">
+                <div class="history-info-card">
+                  <div class="info-label">Züge geprüft</div>
+                  <div class="info-value">1.247</div>
+                </div>
+                <div class="history-info-card">
+                  <div class="info-label">Diskrepanzen gefunden</div>
+                  <div class="info-value red">54</div>
+                </div>
+                <div class="history-info-card">
+                  <div class="info-label">Betroffene Tage</div>
+                  <div class="info-value">13</div>
+                </div>
+                <div class="history-info-card">
+                  <div class="info-label">Zeitraum</div>
+                  <div class="info-value" style="font-size:13px; font-weight:700; margin-top:4px">23.06.–05.07.</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="history-section">
+              <div class="history-section-title">Gelieferte Datensätze (Auszug)</div>
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Objekt</th>
+                    <th>Quelle</th>
+                    <th class="num">Anzahl</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Trains</td>
+                    <td><span class="tag tag-nets">NeTS-AT</span></td>
+                    <td class="num">1.247</td>
+                  </tr>
+                  <tr>
+                    <td>Stops</td>
+                    <td><span class="tag tag-cis">CIS</span></td>
+                    <td class="num">18.432</td>
+                  </tr>
+                  <tr>
+                    <td>Timetables</td>
+                    <td><span class="tag tag-hafas">Hafas</span></td>
+                    <td class="num">1.198</td>
+                  </tr>
+                  <tr>
+                    <td>ServiceDays</td>
+                    <td><span class="tag tag-nets">NeTS-AT</span></td>
+                    <td class="num">362</td>
+                  </tr>
+                  <tr>
+                    <td>Calendars</td>
+                    <td><span class="tag tag-cis">CIS</span></td>
+                    <td class="num">48</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="history-section">
+              <button class="btn btn-secondary btn-sm">📥 Rohdaten herunterladen</button>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Dataload #2450 -->
+        <div class="history-item">
+          <div class="history-header" onclick="toggleHistory(this)">
+            <span class="history-icon">📦</span>
+            <div class="history-meta">
+              <div class="history-title">Dataload #2450 — 22.06.2026, 11:40:53</div>
+              <div class="history-subtitle">Ausgelöst durch: <strong>M. Müller (manuell)</strong> &nbsp;·&nbsp; Datenquellen: NeTS-AT, CIS, Hafas</div>
+            </div>
+            <div class="history-stats">
+              <span class="stat-chip blue">1.231 Züge</span>
+              <span class="stat-chip red">38 Diskrepanzen</span>
+            </div>
+            <span class="history-toggle" style="margin-left:12px">▶</span>
+          </div>
+          <div class="history-body">
+            <div class="history-section">
+              <div class="history-info-grid">
+                <div class="history-info-card">
+                  <div class="info-label">Züge geprüft</div>
+                  <div class="info-value">1.231</div>
+                </div>
+                <div class="history-info-card">
+                  <div class="info-label">Diskrepanzen gefunden</div>
+                  <div class="info-value red">38</div>
+                </div>
+                <div class="history-info-card">
+                  <div class="info-label">Betroffene Tage</div>
+                  <div class="info-value">9</div>
+                </div>
+              </div>
+            </div>
+            <div class="history-section">
+              <button class="btn btn-secondary btn-sm">📥 Rohdaten herunterladen</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dataload #2449 -->
+        <div class="history-item">
+          <div class="history-header" onclick="toggleHistory(this)">
+            <span class="history-icon">📦</span>
+            <div class="history-meta">
+              <div class="history-title">Dataload #2449 — 21.06.2026, 11:39:02</div>
+              <div class="history-subtitle">Ausgelöst durch: <strong>Automatisch (Cron)</strong> &nbsp;·&nbsp; Datenquellen: NeTS-AT, CIS, Hafas</div>
+            </div>
+            <div class="history-stats">
+              <span class="stat-chip blue">1.244 Züge</span>
+              <span class="stat-chip red">61 Diskrepanzen</span>
+            </div>
+            <span class="history-toggle" style="margin-left:12px">▶</span>
+          </div>
+          <div class="history-body">
+            <div class="history-section">
+              <div class="history-info-grid">
+                <div class="history-info-card">
+                  <div class="info-label">Züge geprüft</div>
+                  <div class="info-value">1.244</div>
+                </div>
+                <div class="history-info-card">
+                  <div class="info-label">Diskrepanzen gefunden</div>
+                  <div class="info-value red">61</div>
+                </div>
+                <div class="history-info-card">
+                  <div class="info-label">Betroffene Tage</div>
+                  <div class="info-value">14</div>
+                </div>
+              </div>
+            </div>
+            <div class="history-section">
+              <button class="btn btn-secondary btn-sm">📥 Rohdaten herunterladen</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </section><!-- /panel-history -->
+
+  </main>
+
+</div><!-- /app-shell -->
+
+<!-- ===================== TOAST CONTAINER ===================== -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- ===================== JAVASCRIPT ===================== -->
+<script>
+  // ---- Panel switching ----
+  function switchPanel(id) {
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.getElementById('panel-' + id).classList.add('active');
+    document.getElementById('nav-' + id).classList.add('active');
+  }
+
+  // Set initial active nav
+  document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('nav-zuege').classList.add('active');
+  });
+
+  // ---- Accordion toggle ----
+  function toggleAccordion(header) {
+    const body = header.nextElementSibling;
+    const toggle = header.querySelector('.accordion-toggle');
+    const isOpen = header.classList.contains('open');
+
+    if (isOpen) {
+      header.classList.remove('open');
+      body.classList.remove('open');
+      toggle.classList.remove('open');
+    } else {
+      header.classList.add('open');
+      body.classList.add('open');
+      toggle.classList.add('open');
+    }
+  }
+
+  // ---- Archive toggle ----
+  function toggleArchive(header) {
+    const body = header.nextElementSibling;
+    const toggle = header.querySelector('.accordion-toggle');
+    const isOpen = body.classList.contains('open');
+
+    if (isOpen) {
+      body.classList.remove('open');
+      toggle.classList.remove('open');
+    } else {
+      body.classList.add('open');
+      toggle.classList.add('open');
+    }
+  }
+
+  // ---- History toggle ----
+  function toggleHistory(header) {
+    const body = header.nextElementSibling;
+    const toggle = header.querySelector('.history-toggle');
+    const isOpen = body.classList.contains('open');
+
+    if (isOpen) {
+      body.classList.remove('open');
+      toggle.classList.remove('open');
+    } else {
+      body.classList.add('open');
+      toggle.classList.add('open');
+    }
+  }
+
+  // ---- Mark as done ----
+  function markDone(btn) {
+    const entry = btn.closest('.disc-entry');
+    entry.style.opacity = '0.5';
+    entry.style.transition = 'opacity 0.3s';
+    btn.textContent = '✓ Erledigt';
+    btn.disabled = true;
+    showToast('Eintrag als bearbeitet markiert. ');
+    setTimeout(() => {
+      entry.style.opacity = '1';
+    }, 1500);
+  }
+
+  // ---- Dataload button ----
+  function triggerDataload() {
+    const btn = document.getElementById('dataloadBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<div class="spinner"></div> Wird geladen…';
+    setTimeout(() => {
+      btn.disabled = false;
+      btn.innerHTML = '🔄 Neuen Dataload anfordern';
+      showToast('✓ Dataload #2452 erfolgreich abgeschlossen. 54 Züge geprüft.');
+    }, 2800);
+  }
+
+  // ---- Toast ----
+  function showToast(message) {
+    const msg = message || '✓ 4 Einträge ins Archiv verschoben.';
+    const container = document.getElementById('toastContainer');
+    const toast = document.createElement('div');
+    toast.className = 'toast';
+    toast.innerHTML = `
+      <span>${msg}</span>
+      <span class="toast-undo" onclick="this.parentElement.remove()">Rückgängig</span>
+    `;
+    container.appendChild(toast);
+    setTimeout(() => {
+      toast.style.transition = 'opacity 0.4s';
+      toast.style.opacity = '0';
+      setTimeout(() => toast.remove(), 400);
+    }, 4000);
+  }
+
+  // ---- Archive view toggle ----
+  document.querySelectorAll('.archive-toggle-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      btn.closest('.archive-toggle')
+         .querySelectorAll('.archive-toggle-btn')
+         .forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    });
+  });
+</script>
+
+</body>
+</html>
