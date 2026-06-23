@@ -21,4 +21,5 @@ combine_data(
     path_fahrplan_zueglaeufe_db=path_fahrplan_zueglaeufe_db,
     path_output_zuege=path_output_zuege,
     path_output_zueglaeufe=path_output_zueglaeufe,
+    station_name_mapping=Path("data/station_name_mapping.csv"),
 )
