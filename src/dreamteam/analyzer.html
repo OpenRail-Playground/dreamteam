@@ -95,7 +95,7 @@
     .header-logo {
       width: 44px;
       height: 44px;
-      background: var(--color-primary);
+      background: transparent;
       border-radius: var(--radius-sm);
       display: flex;
       align-items: center;
@@ -520,14 +520,6 @@
       border-bottom: 1px solid var(--color-border);
     }
 
-    .accordion-checkbox {
-      width: 16px;
-      height: 16px;
-      cursor: pointer;
-      accent-color: var(--color-primary);
-      flex-shrink: 0;
-    }
-
     .accordion-meta {
       flex: 1;
       display: flex;
@@ -564,8 +556,8 @@
     }
 
     .disc-count {
-      background: var(--color-primary-light);
-      color: var(--color-primary);
+      background: #FEE2E2;
+      color: #DC2626;
       font-size: 12px;
       font-weight: 700;
       padding: 2px 9px;
@@ -573,8 +565,8 @@
     }
 
     .disc-count.single {
-      background: #FEF3C7;
-      color: #B45309;
+      background: #FEE2E2;
+      color: #DC2626;
     }
 
     .disc-count.many {
@@ -634,8 +626,8 @@
       border-radius: var(--radius-sm);
       font-size: 11px;
       font-weight: 600;
-      background: var(--color-info-bg);
-      color: var(--color-info);
+      background: var(--color-primary-light);
+      color: var(--color-primary-dark);
     }
 
     .disc-entry-text {
@@ -646,6 +638,21 @@
 
     .disc-entry-text strong {
       color: var(--color-primary);
+    }
+
+    .disc-entry-detail {
+      font-size: 12px;
+      color: var(--color-text-muted);
+      background: #F3F4F6;
+      border-radius: var(--radius-sm);
+      padding: 6px 10px;
+      line-height: 1.5;
+    }
+
+    .disc-entry-detail .detail-label {
+      font-weight: 700;
+      color: var(--color-text);
+      margin-right: 4px;
     }
 
     .disc-entry-actions {
@@ -674,8 +681,8 @@
     }
 
     .day-trains-badge {
-      background: var(--color-info-bg);
-      color: var(--color-info);
+      background: var(--color-primary-light);
+      color: var(--color-primary);
       font-size: 12px;
       font-weight: 700;
       padding: 2px 9px;
@@ -711,33 +718,6 @@
       font-size: 12.5px;
       color: var(--color-text-muted);
       flex: 1;
-    }
-
-    /* ===========================
-       BULK ACTION BAR
-    =========================== */
-    .bulk-bar {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      background: var(--color-surface);
-      border: 1px solid var(--color-border);
-      border-radius: var(--radius-md);
-      padding: 12px 18px;
-      box-shadow: var(--shadow-sm);
-    }
-
-    .bulk-bar.hidden {
-      display: none;
-    }
-
-    .bulk-info {
-      font-size: 13px;
-      color: var(--color-text-muted);
-    }
-
-    .bulk-info strong {
-      color: var(--color-text);
     }
 
     /* ===========================
@@ -1055,7 +1035,12 @@
 
     .tag-hafas {
       background: #DCFCE7;
-      color: #166534;
+      color: #163a65;
+    }
+
+    .reload-btn {
+      background: #6a8dd8;
+      color: var(--color-info);
     }
 
     /* ===========================
@@ -1075,6 +1060,65 @@
 
     .date-range-wrap:hover {
       border-color: var(--color-primary);
+    }
+
+    .date-range-control {
+      position: relative;
+    }
+
+    .date-range-popover {
+      position: absolute;
+      top: calc(100% + 8px);
+      left: 0;
+      z-index: 120;
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-md);
+      padding: 10px;
+      display: none;
+      min-width: 280px;
+    }
+
+    .date-range-popover.open {
+      display: block;
+    }
+
+    .date-range-fields {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .date-range-field {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      font-size: 11.5px;
+      color: var(--color-text-muted);
+      font-weight: 600;
+    }
+
+    .date-range-input {
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      padding: 6px 8px;
+      font-size: 12px;
+      color: var(--color-text);
+      background: var(--color-bg);
+      outline: none;
+    }
+
+    .date-range-input:focus {
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 3px rgba(235,0,0,0.10);
+    }
+
+    .date-range-actions {
+      margin-top: 10px;
+      display: flex;
+      justify-content: flex-end;
+      gap: 6px;
     }
 
     /* ===========================
@@ -1207,6 +1251,410 @@
       color: var(--color-text-light);
       margin: 0 4px;
     }
+
+    /* ===========================
+       DETAIL MODAL
+    =========================== */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 20, 35, 0.55);
+      backdrop-filter: blur(3px);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.22s ease;
+    }
+
+    .modal-overlay.open {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .modal {
+      background: var(--color-surface);
+      border-radius: var(--radius-lg);
+      box-shadow: 0 24px 64px rgba(0,0,0,0.22);
+      width: 100%;
+      max-width: 1200px;
+      max-height: 90vh;
+      display: flex;
+      flex-direction: column;
+      transform: translateY(16px) scale(0.98);
+      transition: transform 0.22s ease;
+      overflow: hidden;
+    }
+
+    .modal-overlay.open .modal {
+      transform: translateY(0) scale(1);
+    }
+
+    /* Modal Header */
+    .modal-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      padding: 20px 24px 16px;
+      border-bottom: 1px solid var(--color-border);
+      flex-shrink: 0;
+    }
+
+    .modal-header-info { flex: 1; }
+
+    .modal-train-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--color-primary);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 800;
+      padding: 4px 12px;
+      border-radius: var(--radius-sm);
+      letter-spacing: 0.03em;
+      margin-bottom: 6px;
+    }
+
+    .modal-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--color-text);
+    }
+
+    .modal-meta {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-top: 6px;
+      flex-wrap: wrap;
+    }
+
+    .modal-meta-item {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 12.5px;
+      color: var(--color-text-muted);
+    }
+
+    .modal-meta-item strong {
+      color: var(--color-text);
+      font-weight: 600;
+    }
+
+    .modal-close {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: none;
+      background: #F3F4F6;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      color: var(--color-text-muted);
+      transition: background var(--transition), color var(--transition);
+      flex-shrink: 0;
+    }
+
+    .modal-close:hover {
+      background: #FEE2E2;
+      color: var(--color-primary);
+    }
+
+    /* Discrepancy banner */
+    .modal-disc-banner {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 24px;
+      background: #FFF7F7;
+      border-bottom: 1px solid #FECACA;
+      flex-shrink: 0;
+    }
+
+    .modal-disc-banner-icon { font-size: 16px; }
+
+    .modal-disc-banner-text {
+      font-size: 13px;
+      color: #991B1B;
+    }
+
+    .modal-disc-banner-text strong { font-weight: 700; }
+
+    /* Modal body */
+    .modal-body {
+      flex: 1;
+      overflow: auto;
+      padding: 0;
+    }
+
+    /* Matrix wrapper */
+    .matrix-wrapper {
+      overflow-x: auto;
+      padding: 20px 24px;
+    }
+
+    /* Loading state */
+    .matrix-loading {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 60px 24px;
+      gap: 14px;
+      color: var(--color-text-muted);
+    }
+
+    .matrix-spinner {
+      width: 32px;
+      height: 32px;
+      border: 3px solid var(--color-border);
+      border-top-color: var(--color-primary);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    .matrix-loading-text { font-size: 13px; }
+
+    /* Matrix table */
+    .matrix-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      font-size: 12.5px;
+      min-width: 900px;
+    }
+
+    /* Column group headers (top row) */
+    .matrix-table .col-group-header {
+      background: var(--color-sidebar-bg);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      padding: 8px 14px;
+      text-align: center;
+      border-right: 2px solid rgba(255,255,255,0.15);
+      white-space: nowrap;
+    }
+
+    .matrix-table .col-group-header:first-child {
+      text-align: left;
+      border-radius: var(--radius-sm) 0 0 0;
+      background: #2A3347;
+    }
+
+    .matrix-table .col-group-header:last-child {
+      border-right: none;
+      border-radius: 0 var(--radius-sm) 0 0;
+    }
+
+    /* Sub-headers (second row) */
+    .matrix-table .col-sub-header {
+      background: #F3F4F6;
+      color: var(--color-text-muted);
+      font-size: 10.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      padding: 7px 10px;
+      text-align: center;
+      border-bottom: 2px solid var(--color-border);
+      border-right: 1px solid var(--color-border);
+      white-space: nowrap;
+    }
+
+    .matrix-table .col-sub-header:first-child {
+      text-align: left;
+      background: #EBEDF2;
+      min-width: 180px;
+      border-right: 2px solid var(--color-border);
+    }
+
+    .matrix-table .col-sub-header.sub-arr { color: #1D4ED8; }
+    .matrix-table .col-sub-header.sub-dep { color: #15803D; }
+
+    /* Data rows */
+    .matrix-table tbody tr { transition: background var(--transition); }
+    .matrix-table tbody tr:hover td { background: #F0F4FF; }
+
+    .matrix-table td {
+      padding: 0;
+      border-bottom: 1px solid #F0F2F7;
+      border-right: 1px solid #F0F2F7;
+      vertical-align: middle;
+    }
+
+    .matrix-table td:last-child { border-right: none; }
+
+    /* Station cell */
+    .station-cell {
+      padding: 0;
+      border-right: 2px solid var(--color-border) !important;
+      min-width: 180px;
+      background: #FAFBFC;
+    }
+
+    .station-inner {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+    }
+
+    .station-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      border: 2px solid var(--color-primary);
+      background: #fff;
+      flex-shrink: 0;
+    }
+
+    .station-dot.origin,
+    .station-dot.destination {
+      background: var(--color-primary);
+    }
+
+    .station-name-wrap { display: flex; flex-direction: column; }
+
+    .station-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--color-text);
+      white-space: nowrap;
+    }
+
+    .station-km {
+      font-size: 10.5px;
+      color: var(--color-text-muted);
+      margin-top: 1px;
+    }
+
+    /* Time cell */
+    .time-cell {
+      padding: 8px 10px;
+      text-align: center;
+      border-right: 1px solid #F0F2F7;
+      min-width: 70px;
+    }
+
+    .time-cell.separator-right {
+      border-right: 2px solid var(--color-border) !important;
+    }
+
+    .time-value {
+      font-size: 13px;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+      color: var(--color-text);
+      display: block;
+    }
+
+    .time-value.arr   { color: #1D4ED8; }
+    .time-value.dep   { color: #15803D; }
+    .time-value.empty { color: var(--color-text-light); font-weight: 400; font-size: 12px; }
+
+    /* Discrepancy highlights */
+    .time-cell.disc       { background: #FFF7F0 !important; }
+    .time-cell.disc .time-value { color: var(--color-warning); }
+
+    .time-cell.disc-error { background: #FFF1F1 !important; }
+    .time-cell.disc-error .time-value { color: var(--color-primary); }
+
+    .disc-marker {
+      display: block;
+      font-size: 9px;
+      color: var(--color-warning);
+      font-weight: 700;
+      margin-top: 1px;
+    }
+
+    .disc-marker.error { color: var(--color-primary); }
+
+    /* ARES cell */
+    .ares-cell {
+      padding: 8px 12px;
+      min-width: 120px;
+      border-right: none;
+    }
+
+    .ares-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 8px;
+      border-radius: var(--radius-sm);
+      font-size: 11px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .ares-ok      { background: #DCFCE7; color: #166534; }
+    .ares-warning { background: #FEF3C7; color: #92400E; }
+    .ares-error   { background: #FEE2E2; color: #991B1B; }
+    .ares-empty   { background: #F3F4F6; color: #9CA3AF; }
+
+    /* Column group right border */
+    .col-group-border-right {
+      border-right: 2px solid var(--color-border) !important;
+    }
+
+    /* Legend */
+    .matrix-legend {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      padding: 12px 24px 20px;
+      flex-wrap: wrap;
+      border-top: 1px solid var(--color-border);
+    }
+
+    .legend-title {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--color-text-muted);
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: var(--color-text-muted);
+    }
+
+    .legend-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 2px;
+    }
+
+    .legend-arr  { background: #DBEAFE; border: 1px solid #93C5FD; }
+    .legend-dep  { background: #DCFCE7; border: 1px solid #86EFAC; }
+    .legend-disc { background: #FEF3C7; border: 1px solid #FCD34D; }
+    .legend-err  { background: #FEE2E2; border: 1px solid #FCA5A5; }
+
+    /* Modal footer */
+    .modal-footer {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 10px;
+      padding: 14px 24px;
+      border-top: 1px solid var(--color-border);
+      background: #FAFBFC;
+      flex-shrink: 0;
+    }
   </style>
 </head>
 <body>
@@ -1218,8 +1666,8 @@
     <div class="header-brand">
       <div class="header-logo">🚆</div>
       <div>
-        <div class="header-title">Fahrplan-Diskrepanz-Analyzer</div>
-        <div class="header-subtitle">Vergleich: NeTS-AT · CIS · Hafas</div>
+        <div class="header-title">Nightwatch</div>
+        <div class="header-subtitle">Vergleich: SBB · ÖBB · DB</div>
       </div>
     </div>
 
@@ -1227,10 +1675,9 @@
       <div class="dataload-info">
         <span class="dataload-label">Letzter Dataload:</span>
         <span class="dataload-timestamp">23.06.2026, 11:42</span>
-        <span class="status-pill fresh">frisch</span>
       </div>
 
-      <button class="btn btn-primary" id="dataloadBtn" onclick="triggerDataload()">
+      <button class="btn .reload-btn" id="dataloadBtn" onclick="triggerDataload()">
         🔄 Neuen Dataload anfordern
       </button>
 
@@ -1248,13 +1695,11 @@
     <a class="nav-item" onclick="switchPanel('zuege')" id="nav-zuege">
       <span class="nav-icon">🔍</span>
       <span class="nav-label">Pro Zug</span>
-      <span class="nav-badge">42</span>
     </a>
 
     <a class="nav-item" onclick="switchPanel('tage')" id="nav-tage">
       <span class="nav-icon">📅</span>
       <span class="nav-label">Pro Tag</span>
-      <span class="nav-badge">12</span>
     </a>
 
     <div class="nav-divider"></div>
@@ -1277,7 +1722,7 @@
     </a>
 
     <div class="sidebar-footer">
-      v2.4.1 · © 2026 SBB
+      v0.0.1 · © 2026 SBB
     </div>
   </aside>
 
@@ -1290,7 +1735,7 @@
       <div class="page-header">
         <div>
           <h1 class="page-title">Diskrepanzen pro Zug</h1>
-          <p class="page-desc">42 offene Diskrepanzen in 18 Zügen</p>
+          <p class="page-desc">Laden...</p>
         </div>
       </div>
 
@@ -1303,9 +1748,9 @@
 
         <select class="filter-select">
           <option>Quelle: Alle</option>
-          <option>NeTS-AT</option>
-          <option>CIS</option>
-          <option>Hafas</option>
+          <option>SBB</option>
+          <option>ÖBB</option>
+          <option>DB</option>
         </select>
 
         <select class="filter-select">
@@ -1323,194 +1768,9 @@
       </div>
 
       <!-- Accordion List -->
-      <div class="accordion-list">
-
-        <!-- Item 1: IC 723 -->
-        <div class="accordion-item">
-          <div class="accordion-header" onclick="toggleAccordion(this)">
-            <input type="checkbox" class="accordion-checkbox" onclick="event.stopPropagation()" />
-            <div class="accordion-meta">
-              <span class="train-id">IC 723</span>
-              <span class="train-route">
-                Zürich HB
-                <span class="route-arrow">→</span>
-                Genève-Aéroport
-              </span>
-              <span class="disc-badge">
-                <span class="disc-count many">3 Diskrepanzen</span>
-              </span>
-            </div>
-            <span class="accordion-toggle">▶</span>
-          </div>
-          <div class="accordion-body">
-            <!-- Entry 1 -->
-            <div class="disc-entry">
-              <div class="disc-entry-header">
-                <input type="checkbox" class="accordion-checkbox" />
-                <span class="disc-entry-date">24.06.2026</span>
-                <span class="source-tag">NeTS-AT</span>
-              </div>
-              <div class="disc-entry-text">
-                <strong>Abfahrtszeit</strong> weicht um <strong>+2 Min</strong> ab gegenüber CIS und Hafas.
-              </div>
-              <div class="disc-entry-actions">
-                <button class="btn btn-ghost btn-sm">📋 Details</button>
-                <button class="btn btn-success btn-sm" onclick="markDone(this)">✓ Als bearbeitet markieren</button>
-              </div>
-            </div>
-            <!-- Entry 2 -->
-            <div class="disc-entry">
-              <div class="disc-entry-header">
-                <input type="checkbox" class="accordion-checkbox" />
-                <span class="disc-entry-date">25.06.2026</span>
-                <span class="source-tag">CIS</span>
-              </div>
-              <div class="disc-entry-text">
-                Halt <strong>Bern</strong> fehlt in CIS, vorhanden in NeTS-AT und Hafas.
-              </div>
-              <div class="disc-entry-actions">
-                <button class="btn btn-ghost btn-sm">📋 Details</button>
-                <button class="btn btn-success btn-sm" onclick="markDone(this)">✓ Als bearbeitet markieren</button>
-              </div>
-            </div>
-            <!-- Entry 3 -->
-            <div class="disc-entry">
-              <div class="disc-entry-header">
-                <input type="checkbox" class="accordion-checkbox" />
-                <span class="disc-entry-date">26.06.2026</span>
-                <span class="source-tag">Hafas</span>
-              </div>
-              <div class="disc-entry-text">
-                Ankunftszeit in <strong>Genève-Aéroport</strong> weicht um <strong>−1 Min</strong> ab gegenüber NeTS-AT.
-              </div>
-              <div class="disc-entry-actions">
-                <button class="btn btn-ghost btn-sm">📋 Details</button>
-                <button class="btn btn-success btn-sm" onclick="markDone(this)">✓ Als bearbeitet markieren</button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Item 2: IR 1567 -->
-        <div class="accordion-item">
-          <div class="accordion-header open" onclick="toggleAccordion(this)">
-            <input type="checkbox" class="accordion-checkbox" onclick="event.stopPropagation()" />
-            <div class="accordion-meta">
-              <span class="train-id">IR 1567</span>
-              <span class="train-route">
-                Basel SBB
-                <span class="route-arrow">→</span>
-                Locarno
-              </span>
-              <span class="disc-badge">
-                <span class="disc-count single">1 Diskrepanz</span>
-              </span>
-            </div>
-            <span class="accordion-toggle open">▶</span>
-          </div>
-          <div class="accordion-body open">
-            <div class="disc-entry">
-              <div class="disc-entry-header">
-                <input type="checkbox" class="accordion-checkbox" />
-                <span class="disc-entry-date">24.06.2026</span>
-                <span class="source-tag">NeTS-AT</span>
-              </div>
-              <div class="disc-entry-text">
-                <strong>Abfahrtszeit</strong> weicht um <strong>+2 Min</strong> ab gegenüber CIS und Hafas.
-              </div>
-              <div class="disc-entry-actions">
-                <button class="btn btn-ghost btn-sm">📋 Details</button>
-                <button class="btn btn-success btn-sm" onclick="markDone(this)">✓ Als bearbeitet markieren</button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Item 3: IC 921 -->
-        <div class="accordion-item">
-          <div class="accordion-header" onclick="toggleAccordion(this)">
-            <input type="checkbox" class="accordion-checkbox" onclick="event.stopPropagation()" />
-            <div class="accordion-meta">
-              <span class="train-id">IC 921</span>
-              <span class="train-route">
-                Brig
-                <span class="route-arrow">→</span>
-                Romanshorn
-              </span>
-              <span class="disc-badge">
-                <span class="disc-count many">5 Diskrepanzen</span>
-              </span>
-            </div>
-            <span class="accordion-toggle">▶</span>
-          </div>
-          <div class="accordion-body">
-            <div class="disc-entry">
-              <div class="disc-entry-header">
-                <input type="checkbox" class="accordion-checkbox" />
-                <span class="disc-entry-date">23.06.2026</span>
-                <span class="source-tag">CIS</span>
-              </div>
-              <div class="disc-entry-text">
-                Zusatzhalt <strong>Spiez</strong> in Hafas nicht vorhanden. Mögliche Planungsabweichung.
-              </div>
-              <div class="disc-entry-actions">
-                <button class="btn btn-ghost btn-sm">📋 Details</button>
-                <button class="btn btn-success btn-sm" onclick="markDone(this)">✓ Als bearbeitet markieren</button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Item 4: RE 3291 -->
-        <div class="accordion-item">
-          <div class="accordion-header" onclick="toggleAccordion(this)">
-            <input type="checkbox" class="accordion-checkbox" onclick="event.stopPropagation()" />
-            <div class="accordion-meta">
-              <span class="train-id">RE 3291</span>
-              <span class="train-route">
-                Luzern
-                <span class="route-arrow">→</span>
-                Olten
-              </span>
-              <span class="disc-badge">
-                <span class="disc-count">2 Diskrepanzen</span>
-              </span>
-            </div>
-            <span class="accordion-toggle">▶</span>
-          </div>
-          <div class="accordion-body">
-            <div class="disc-entry">
-              <div class="disc-entry-header">
-                <input type="checkbox" class="accordion-checkbox" />
-                <span class="disc-entry-date">27.06.2026</span>
-                <span class="source-tag">Hafas</span>
-              </div>
-              <div class="disc-entry-text">
-                Fahrtrichtungswechsel in <strong>Zofingen</strong> nicht in NeTS-AT erfasst.
-              </div>
-              <div class="disc-entry-actions">
-                <button class="btn btn-ghost btn-sm">📋 Details</button>
-                <button class="btn btn-success btn-sm" onclick="markDone(this)">✓ Als bearbeitet markieren</button>
-              </div>
-            </div>
-          </div>
-        </div>
-
+      <div class="accordion-list" id="zuege-list">
+        <div class="empty-state"><span class="empty-icon">⏳</span><span class="empty-title">Daten werden geladen…</span></div>
       </div><!-- /accordion-list -->
-
-      <!-- Bulk Action Bar -->
-      <div class="bulk-bar" id="bulkBar">
-        <span class="bulk-info">
-          Auswahl: <strong>2 Züge / 4 Einträge</strong>
-        </span>
-        <div class="toolbar-spacer"></div>
-        <button class="btn btn-success" onclick="showToast()">
-          ✓ Markierte ins Archiv verschieben
-        </button>
-        <button class="btn btn-secondary" onclick="document.getElementById('bulkBar').classList.add('hidden')">
-          Auswahl aufheben
-        </button>
-      </div>
 
     </section><!-- /panel-zuege -->
 
@@ -1521,22 +1781,37 @@
       <div class="page-header">
         <div>
           <h1 class="page-title">Diskrepanzen pro Tag</h1>
-          <p class="page-desc">Zeitraum: 20.06.–30.06.2026 · 12 Tage mit Diskrepanzen</p>
+          <p class="page-desc">Laden...</p>
         </div>
       </div>
 
       <!-- Toolbar -->
       <div class="toolbar">
-        <span style="font-size:15px">📅</span>
-        <div class="date-range-wrap">
-          📅 20.06.2026 – 30.06.2026 ▾
+        <div class="date-range-control" id="dayDateRangeControl">
+          <div class="date-range-wrap" id="dayDateRangeTrigger" role="button" tabindex="0" aria-label="Datumsbereich auswählen" aria-expanded="false">
+            📅 <span id="dayDateRangeLabel">20.06.2026 – 30.06.2026</span> ▾
+          </div>
+          <div class="date-range-popover" id="dayDateRangePopover">
+            <div class="date-range-fields">
+              <label class="date-range-field">Von
+                <input class="date-range-input" type="date" id="dayDateFrom" />
+              </label>
+              <label class="date-range-field">Bis
+                <input class="date-range-input" type="date" id="dayDateTo" />
+              </label>
+            </div>
+            <div class="date-range-actions">
+              <button class="btn btn-secondary btn-sm" type="button" id="dayDateResetBtn">Zurücksetzen</button>
+              <button class="btn btn-primary btn-sm" type="button" id="dayDateApplyBtn">Anwenden</button>
+            </div>
+          </div>
         </div>
 
         <select class="filter-select">
           <option>Quelle: Alle</option>
-          <option>NeTS-AT</option>
-          <option>CIS</option>
-          <option>Hafas</option>
+          <option>SBB</option>
+          <option>ÖBB</option>
+          <option>DB</option>
         </select>
 
         <div class="toolbar-spacer"></div>
@@ -1547,122 +1822,8 @@
       </div>
 
       <!-- Day Accordion -->
-      <div class="accordion-list">
-
-        <!-- Mo 24.06 -->
-        <div class="accordion-item">
-          <div class="accordion-header open" onclick="toggleAccordion(this)">
-            <input type="checkbox" class="accordion-checkbox" onclick="event.stopPropagation()" />
-            <div class="accordion-meta">
-              <div class="day-header">
-                <span class="day-label">Mo, 24.06.2026</span>
-              </div>
-              <span class="disc-badge">
-                <span class="day-trains-badge">12 Züge betroffen</span>
-              </span>
-            </div>
-            <span class="accordion-toggle open">▶</span>
-          </div>
-          <div class="accordion-body open">
-            <div class="day-entry">
-              <div class="day-entry-row">
-                <input type="checkbox" class="accordion-checkbox" />
-                <span class="train-id">IR 1567</span>
-                <span class="train-route">Basel SBB <span class="route-arrow">→</span> Locarno</span>
-                <div style="flex:1"></div>
-                <span class="day-entry-disc">Abfahrtszeit weicht +2 Min ab</span>
-                <span class="source-tag" style="margin-left:10px">NeTS-AT</span>
-              </div>
-              <div class="day-entry-row">
-                <input type="checkbox" class="accordion-checkbox" />
-                <span class="train-id">IC 723</span>
-                <span class="train-route">Zürich HB <span class="route-arrow">→</span> Genève-Aéroport</span>
-                <div style="flex:1"></div>
-                <span class="day-entry-disc">Halt in Bern fehlt</span>
-                <span class="source-tag" style="margin-left:10px">CIS</span>
-              </div>
-              <div class="day-entry-row">
-                <input type="checkbox" class="accordion-checkbox" />
-                <span class="train-id">EC 195</span>
-                <span class="train-route">Zürich HB <span class="route-arrow">→</span> Milano Centrale</span>
-                <div style="flex:1"></div>
-                <span class="day-entry-disc">Ankunft weicht −3 Min ab</span>
-                <span class="source-tag" style="margin-left:10px">Hafas</span>
-              </div>
-              <div class="day-entry-row" style="color: var(--color-text-muted); font-size:12.5px; padding-left:44px">
-                … weitere 9 Züge nicht angezeigt
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Di 25.06 -->
-        <div class="accordion-item">
-          <div class="accordion-header" onclick="toggleAccordion(this)">
-            <input type="checkbox" class="accordion-checkbox" onclick="event.stopPropagation()" />
-            <div class="accordion-meta">
-              <div class="day-header">
-                <span class="day-label">Di, 25.06.2026</span>
-              </div>
-              <span class="disc-badge">
-                <span class="day-trains-badge">3 Züge betroffen</span>
-              </span>
-            </div>
-            <span class="accordion-toggle">▶</span>
-          </div>
-          <div class="accordion-body">
-            <div class="day-entry">
-              <div class="day-entry-row">
-                <input type="checkbox" class="accordion-checkbox" />
-                <span class="train-id">IC 921</span>
-                <span class="train-route">Brig <span class="route-arrow">→</span> Romanshorn</span>
-                <div style="flex:1"></div>
-                <span class="day-entry-disc">Zusatzhalt Spiez fehlt in Hafas</span>
-                <span class="source-tag" style="margin-left:10px">CIS</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Mi 26.06 -->
-        <div class="accordion-item">
-          <div class="accordion-header" onclick="toggleAccordion(this)">
-            <input type="checkbox" class="accordion-checkbox" onclick="event.stopPropagation()" />
-            <div class="accordion-meta">
-              <div class="day-header">
-                <span class="day-label">Mi, 26.06.2026</span>
-              </div>
-              <span class="disc-badge">
-                <span class="day-trains-badge">7 Züge betroffen</span>
-              </span>
-            </div>
-            <span class="accordion-toggle">▶</span>
-          </div>
-          <div class="accordion-body">
-            <div class="day-entry">
-              <div class="day-entry-row">
-                <input type="checkbox" class="accordion-checkbox" />
-                <span class="train-id">RE 3291</span>
-                <span class="train-route">Luzern <span class="route-arrow">→</span> Olten</span>
-                <div style="flex:1"></div>
-                <span class="day-entry-disc">Fahrtrichtungswechsel fehlt</span>
-                <span class="source-tag" style="margin-left:10px">Hafas</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-      </div>
-
-      <!-- Bulk Bar -->
-      <div class="bulk-bar">
-        <span class="bulk-info">
-          Auswahl: <strong>0 Einträge</strong>
-        </span>
-        <div class="toolbar-spacer"></div>
-        <button class="btn btn-success" onclick="showToast()">
-          ✓ Markierte ins Archiv verschieben
-        </button>
+      <div class="accordion-list" id="tage-list">
+        <div class="empty-state"><span class="empty-icon">⏳</span><span class="empty-title">Daten werden geladen…</span></div>
       </div>
 
     </section><!-- /panel-tage -->
@@ -1706,86 +1867,8 @@
       </div>
 
       <!-- Archive Entries -->
-      <div style="display:flex; flex-direction:column; gap:8px;">
-
-        <div class="archive-entry">
-          <div class="archive-entry-header" onclick="toggleArchive(this)">
-            <div class="archive-meta">
-              <div class="archive-train">IC 723 <span class="text-muted font-bold separator">·</span>
-                <span style="font-weight:400; font-size:13px">Zürich HB → Genève-Aéroport</span>
-              </div>
-              <div class="archive-route">bearbeitet: 22.06.2026, 14:33 Uhr</div>
-            </div>
-            <span class="archive-badge">✓ Erledigt</span>
-            <span class="accordion-toggle" style="margin-left:12px">▶</span>
-          </div>
-          <div class="archive-body">
-            <div class="archive-detail">
-              <div><strong>Datum:</strong> 24.06.2026 &nbsp;|&nbsp; <strong>Quelle:</strong> <span class="source-tag">NeTS-AT</span></div>
-              <div style="margin-top:6px"><strong>Diskrepanz:</strong> Abfahrtszeit weicht um +2 Min ab gegenüber CIS und Hafas.</div>
-              <div class="audit-line">
-                ✓ Bearbeitet von <strong>M. Müller</strong> am 22.06.2026, 14:33 Uhr
-              </div>
-            </div>
-            <div class="archive-actions">
-              <button class="btn btn-secondary btn-sm">↩ Wiederherstellen</button>
-              <button class="btn btn-ghost btn-sm">📋 Details anzeigen</button>
-            </div>
-          </div>
-        </div>
-
-        <div class="archive-entry">
-          <div class="archive-entry-header" onclick="toggleArchive(this)">
-            <div class="archive-meta">
-              <div class="archive-train">IR 2044 <span class="text-muted font-bold separator">·</span>
-                <span style="font-weight:400; font-size:13px">St. Gallen → Bern</span>
-              </div>
-              <div class="archive-route">bearbeitet: 21.06.2026, 09:15 Uhr</div>
-            </div>
-            <span class="archive-badge">✓ Erledigt</span>
-            <span class="accordion-toggle" style="margin-left:12px">▶</span>
-          </div>
-          <div class="archive-body">
-            <div class="archive-detail">
-              <div><strong>Datum:</strong> 22.06.2026 &nbsp;|&nbsp; <strong>Quelle:</strong> <span class="source-tag">CIS</span></div>
-              <div style="margin-top:6px"><strong>Diskrepanz:</strong> Halt Winterthur in CIS als fakultativ markiert, in Hafas als regulär.</div>
-              <div class="audit-line">
-                ✓ Bearbeitet von <strong>S. Keller</strong> am 21.06.2026, 09:15 Uhr
-              </div>
-            </div>
-            <div class="archive-actions">
-              <button class="btn btn-secondary btn-sm">↩ Wiederherstellen</button>
-              <button class="btn btn-ghost btn-sm">📋 Details anzeigen</button>
-            </div>
-          </div>
-        </div>
-
-        <div class="archive-entry">
-          <div class="archive-entry-header" onclick="toggleArchive(this)">
-            <div class="archive-meta">
-              <div class="archive-train">EC 195 <span class="text-muted font-bold separator">·</span>
-                <span style="font-weight:400; font-size:13px">Zürich HB → Milano Centrale</span>
-              </div>
-              <div class="archive-route">bearbeitet: 20.06.2026, 16:48 Uhr</div>
-            </div>
-            <span class="archive-badge">✓ Erledigt</span>
-            <span class="accordion-toggle" style="margin-left:12px">▶</span>
-          </div>
-          <div class="archive-body">
-            <div class="archive-detail">
-              <div><strong>Datum:</strong> 20.06.2026 &nbsp;|&nbsp; <strong>Quelle:</strong> <span class="source-tag">Hafas</span></div>
-              <div style="margin-top:6px"><strong>Diskrepanz:</strong> Ankunftszeit in Chiasso weicht um −3 Min ab gegenüber NeTS-AT und CIS.</div>
-              <div class="audit-line">
-                ✓ Bearbeitet von <strong>T. Baumann</strong> am 20.06.2026, 16:48 Uhr
-              </div>
-            </div>
-            <div class="archive-actions">
-              <button class="btn btn-secondary btn-sm">↩ Wiederherstellen</button>
-              <button class="btn btn-ghost btn-sm">📋 Details anzeigen</button>
-            </div>
-          </div>
-        </div>
-
+      <div style="display:flex; flex-direction:column; gap:8px;" id="archiveEntries">
+        <!-- Populated dynamically when items are marked as done -->
       </div>
 
     </section><!-- /panel-archiv -->
@@ -1809,7 +1892,7 @@
             <span class="history-icon">📦</span>
             <div class="history-meta">
               <div class="history-title">Dataload #2451 — 23.06.2026, 11:42:17</div>
-              <div class="history-subtitle">Ausgelöst durch: <strong>Automatisch (Cron)</strong> &nbsp;·&nbsp; Datenquellen: NeTS-AT, CIS, Hafas</div>
+              <div class="history-subtitle">Ausgelöst durch: <strong>Automatisch (Cron)</strong></div>
             </div>
             <div class="history-stats">
               <span class="stat-chip blue">1.247 Züge</span>
@@ -1975,6 +2058,682 @@
 
 <!-- ===================== JAVASCRIPT ===================== -->
 <script>
+  // ---- API BASE URL ----
+  const API_BASE_URL = '/api';
+  const ARCHIVE_KEYS_STORAGE_KEY = 'dreamteam.archivedDiscrepancyKeys';
+  const ARCHIVE_RECORDS_STORAGE_KEY = 'dreamteam.archiveRecords';
+  const archivedDiscrepancyKeys = new Set();
+  const discrepancyIndex = new Map();
+  const expandedTrainIds = new Set();
+  const expandedDayDates = new Set();
+  const dayDateRange = {
+    start: '',
+    end: ''
+  };
+  const dayDateRangeBounds = {
+    start: '',
+    end: ''
+  };
+  let dayDateRangeInitialized = false;
+  let archiveRecords = [];
+  let trainDataCache = [];
+  let dayDataCache = [];
+
+  function stripHtml(value) {
+    const temp = document.createElement('div');
+    temp.innerHTML = value || '';
+    return temp.textContent || temp.innerText || '';
+  }
+
+  function buildDiscrepancyKey(trainId, disc) {
+    const text = stripHtml(disc?.text || '').replace(/\s+/g, ' ').trim();
+    const halt = (disc?.halt || '').trim();
+    const source = (disc?.source || '').trim();
+    const date = (disc?.date || '').trim();
+    return [trainId || '', date, halt, source, text].join('||');
+  }
+
+  function getTimestampNow() {
+    const now = new Date();
+    const pad = n => String(n).padStart(2, '0');
+    return `${pad(now.getDate())}.${pad(now.getMonth() + 1)}.${now.getFullYear()}, ${pad(now.getHours())}:${pad(now.getMinutes())} Uhr`;
+  }
+
+  function addArchiveEntry(record, prepend = true) {
+    const archiveEntries = document.getElementById('archiveEntries');
+    if (!archiveEntries || !record) return;
+
+    const archiveEntry = document.createElement('div');
+    archiveEntry.className = 'archive-entry';
+    archiveEntry.dataset.archiveKey = record.key || '';
+    archiveEntry.innerHTML = `
+      <div class="archive-entry-header" onclick="toggleArchive(this)">
+        <div class="archive-meta">
+          <div class="archive-train">${record.trainId || 'Unbekannter Zug'} <span class="text-muted font-bold separator">·</span>
+            <span style="font-weight:400; font-size:13px">${record.route || ''}</span>
+          </div>
+          <div class="archive-route">bearbeitet: ${record.timestamp}</div>
+        </div>
+        <span class="archive-badge">✓ Erledigt</span>
+        <span class="accordion-toggle" style="margin-left:12px">▶</span>
+      </div>
+      <div class="archive-body">
+        <div class="archive-detail">
+          <div><strong>Datum:</strong> ${record.date || '-'} &nbsp;|&nbsp; <strong>Quelle:</strong> <span class="source-tag">${record.source || 'Unbekannt'}</span></div>
+          <div style="margin-top:6px"><strong>Diskrepanz:</strong> ${record.discrepancy || ''}</div>
+          <div class="audit-line">
+            ✓ Bearbeitet von <strong>M. Müller</strong> am ${record.timestamp}
+          </div>
+        </div>
+        <div class="archive-actions">
+          <button class="btn btn-secondary btn-sm" onclick="restoreArchivedEntry(this, event)">↩ Wiederherstellen</button>
+          <button class="btn btn-ghost btn-sm">📋 Details anzeigen</button>
+        </div>
+      </div>
+    `;
+    if (prepend) {
+      archiveEntries.prepend(archiveEntry);
+    } else {
+      archiveEntries.appendChild(archiveEntry);
+    }
+  }
+
+  function saveArchiveState() {
+    localStorage.setItem(ARCHIVE_KEYS_STORAGE_KEY, JSON.stringify(Array.from(archivedDiscrepancyKeys)));
+    localStorage.setItem(ARCHIVE_RECORDS_STORAGE_KEY, JSON.stringify(archiveRecords));
+  }
+
+  function restoreArchiveState() {
+    try {
+      const rawKeys = localStorage.getItem(ARCHIVE_KEYS_STORAGE_KEY);
+      const rawRecords = localStorage.getItem(ARCHIVE_RECORDS_STORAGE_KEY);
+
+      if (rawKeys) {
+        const parsedKeys = JSON.parse(rawKeys);
+        if (Array.isArray(parsedKeys)) {
+          parsedKeys.forEach(key => {
+            if (typeof key === 'string' && key.trim()) {
+              archivedDiscrepancyKeys.add(key);
+            }
+          });
+        }
+      }
+
+      if (rawRecords) {
+        const parsedRecords = JSON.parse(rawRecords);
+        if (Array.isArray(parsedRecords)) {
+          archiveRecords = parsedRecords.filter(record => (
+            record &&
+            typeof record === 'object' &&
+            typeof record.key === 'string' &&
+            typeof record.timestamp === 'string'
+          ));
+        }
+      }
+    } catch (error) {
+      console.warn('Archive state could not be restored:', error);
+      archiveRecords = [];
+      archivedDiscrepancyKeys.clear();
+    }
+
+    const archiveEntries = document.getElementById('archiveEntries');
+    if (archiveEntries) {
+      archiveEntries.innerHTML = '';
+      archiveRecords.forEach(record => addArchiveEntry(record, false));
+    }
+
+    updateArchiveBadge();
+  }
+
+  function formatDateFromIso(dateStr) {
+    if (!dateStr || typeof dateStr !== 'string') return '';
+    const parts = dateStr.split('-');
+    if (parts.length !== 3) return dateStr;
+    const [year, month, day] = parts;
+    return `${day}.${month}.${year}`;
+  }
+
+  function normalizeDateToIso(dateValue) {
+    if (!dateValue || typeof dateValue !== 'string') return '';
+    const trimmed = dateValue.trim();
+    if (!trimmed) return '';
+
+    if (/^\d{4}-\d{2}-\d{2}$/.test(trimmed)) {
+      return trimmed;
+    }
+
+    const dotMatch = trimmed.match(/^(\d{2})\.(\d{2})\.(\d{4})$/);
+    if (dotMatch) {
+      return `${dotMatch[3]}-${dotMatch[2]}-${dotMatch[1]}`;
+    }
+
+    const slashMatch = trimmed.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+    if (slashMatch) {
+      return `${slashMatch[3]}-${slashMatch[2]}-${slashMatch[1]}`;
+    }
+
+    return '';
+  }
+
+  function isDateWithinRange(dateValue, startDate, endDate) {
+    const normalized = normalizeDateToIso(dateValue);
+    if (!normalized) return false;
+    if (startDate && normalized < startDate) return false;
+    if (endDate && normalized > endDate) return false;
+    return true;
+  }
+
+  function updateDayDateRangeLabel() {
+    const label = document.getElementById('dayDateRangeLabel');
+    if (!label) return;
+
+    const start = dayDateRange.start;
+    const end = dayDateRange.end;
+    if (!start || !end) {
+      label.textContent = 'Alle Daten';
+      return;
+    }
+
+    label.textContent = `${formatDateFromIso(start)} – ${formatDateFromIso(end)}`;
+  }
+
+  function closeDayDateRangePopover() {
+    const popover = document.getElementById('dayDateRangePopover');
+    const trigger = document.getElementById('dayDateRangeTrigger');
+    if (popover) popover.classList.remove('open');
+    if (trigger) trigger.setAttribute('aria-expanded', 'false');
+  }
+
+  function openDayDateRangePopover() {
+    const popover = document.getElementById('dayDateRangePopover');
+    const trigger = document.getElementById('dayDateRangeTrigger');
+    const fromInput = document.getElementById('dayDateFrom');
+    const toInput = document.getElementById('dayDateTo');
+    if (!popover || !trigger) return;
+
+    if (fromInput) fromInput.value = dayDateRange.start || '';
+    if (toInput) toInput.value = dayDateRange.end || '';
+
+    popover.classList.add('open');
+    trigger.setAttribute('aria-expanded', 'true');
+  }
+
+  function syncDayDateRangeWithData(days) {
+    if (!Array.isArray(days) || days.length === 0) return;
+
+    const dateValues = days
+      .map(day => normalizeDateToIso(day?.date || ''))
+      .filter(Boolean)
+      .sort();
+
+    if (!dateValues.length) return;
+
+    const minDate = dateValues[0];
+    const maxDate = dateValues[dateValues.length - 1];
+    dayDateRangeBounds.start = minDate;
+    dayDateRangeBounds.end = maxDate;
+
+    if (!dayDateRangeInitialized) {
+      dayDateRange.start = minDate;
+      dayDateRange.end = maxDate;
+      dayDateRangeInitialized = true;
+    } else {
+      if (!dayDateRange.start || dayDateRange.start < minDate) dayDateRange.start = minDate;
+      if (!dayDateRange.end || dayDateRange.end > maxDate) dayDateRange.end = maxDate;
+      if (dayDateRange.start > dayDateRange.end) {
+        dayDateRange.start = minDate;
+        dayDateRange.end = maxDate;
+      }
+    }
+
+    updateDayDateRangeLabel();
+
+    const fromInput = document.getElementById('dayDateFrom');
+    const toInput = document.getElementById('dayDateTo');
+    if (fromInput) {
+      fromInput.min = minDate;
+      fromInput.max = maxDate;
+      fromInput.value = dayDateRange.start;
+    }
+    if (toInput) {
+      toInput.min = minDate;
+      toInput.max = maxDate;
+      toInput.value = dayDateRange.end;
+    }
+  }
+
+  function applyDayDateRangeFilter() {
+    populateDayAccordion(dayDataCache);
+    applyFilters('tage');
+  }
+
+  function initializeDayDateRangeControl() {
+    const control = document.getElementById('dayDateRangeControl');
+    const trigger = document.getElementById('dayDateRangeTrigger');
+    const popover = document.getElementById('dayDateRangePopover');
+    const applyBtn = document.getElementById('dayDateApplyBtn');
+    const resetBtn = document.getElementById('dayDateResetBtn');
+    const fromInput = document.getElementById('dayDateFrom');
+    const toInput = document.getElementById('dayDateTo');
+
+    if (!control || !trigger || !popover || !applyBtn || !resetBtn) return;
+
+    trigger.addEventListener('click', () => {
+      if (popover.classList.contains('open')) {
+        closeDayDateRangePopover();
+      } else {
+        openDayDateRangePopover();
+      }
+    });
+
+    trigger.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        if (popover.classList.contains('open')) {
+          closeDayDateRangePopover();
+        } else {
+          openDayDateRangePopover();
+        }
+      }
+    });
+
+    applyBtn.addEventListener('click', () => {
+      const nextStart = fromInput?.value || '';
+      const nextEnd = toInput?.value || '';
+
+      if (!nextStart || !nextEnd) {
+        showToast('Bitte Start- und Enddatum auswählen.');
+        return;
+      }
+
+      if (nextStart > nextEnd) {
+        showToast('Das Startdatum muss vor dem Enddatum liegen.');
+        return;
+      }
+
+      dayDateRange.start = nextStart;
+      dayDateRange.end = nextEnd;
+      updateDayDateRangeLabel();
+      closeDayDateRangePopover();
+      applyDayDateRangeFilter();
+    });
+
+    resetBtn.addEventListener('click', () => {
+      if (!dayDateRangeBounds.start || !dayDateRangeBounds.end) return;
+      dayDateRange.start = dayDateRangeBounds.start;
+      dayDateRange.end = dayDateRangeBounds.end;
+      if (fromInput) fromInput.value = dayDateRange.start;
+      if (toInput) toInput.value = dayDateRange.end;
+      updateDayDateRangeLabel();
+      closeDayDateRangePopover();
+      applyDayDateRangeFilter();
+    });
+
+    document.addEventListener('click', e => {
+      if (!popover.classList.contains('open')) return;
+      if (!control.contains(e.target)) {
+        closeDayDateRangePopover();
+      }
+    });
+  }
+
+  function refreshDiscrepancyPanels() {
+    populateTrainAccordion(trainDataCache);
+    populateDayAccordion(dayDataCache);
+    applyFilters('zuege');
+    applyFilters('tage');
+    refreshOpenDiscrepancyStats();
+  }
+
+  function archiveByKeys(keys) {
+    const timestamp = getTimestampNow();
+    let archivedCount = 0;
+
+    keys.forEach(key => {
+      if (!key || archivedDiscrepancyKeys.has(key)) return;
+      archivedDiscrepancyKeys.add(key);
+      const record = discrepancyIndex.get(key);
+      if (record) {
+        const archiveRecord = {
+          key,
+          ...record,
+          timestamp
+        };
+        archiveRecords.unshift(archiveRecord);
+        addArchiveEntry(archiveRecord);
+      }
+      archivedCount += 1;
+    });
+
+    if (archivedCount > 0) {
+      saveArchiveState();
+      refreshDiscrepancyPanels();
+      updateArchiveBadge();
+    }
+
+    return archivedCount;
+  }
+
+  function restoreArchivedEntry(btn, event) {
+    if (event) event.stopPropagation();
+
+    const archiveEntryEl = btn?.closest('.archive-entry');
+    const key = archiveEntryEl?.dataset?.archiveKey || '';
+    if (!key) {
+      showToast('Wiederherstellung nicht möglich.');
+      return;
+    }
+
+    const wasArchived = archivedDiscrepancyKeys.delete(key);
+    archiveRecords = archiveRecords.filter(record => record.key !== key);
+
+    if (archiveEntryEl) {
+      archiveEntryEl.remove();
+    }
+
+    saveArchiveState();
+    refreshDiscrepancyPanels();
+    updateArchiveBadge();
+
+    if (wasArchived) {
+      showToast('Eintrag wiederhergestellt.');
+    } else {
+      showToast('Eintrag wurde bereits wiederhergestellt.');
+    }
+  }
+
+  // ---- Data Loading ----
+  function showListError(listId, message) {
+    const el = document.getElementById(listId);
+    if (el) el.innerHTML = `<div class="empty-state"><span class="empty-icon">⚠️</span><span class="empty-title">Fehler beim Laden</span><span class="empty-desc">${message}</span></div>`;
+  }
+
+  async function loadDiscrepanciesByTrain() {
+    try {
+      const response = await fetch(`${API_BASE_URL}/discrepancies-by-train`);
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const data = await response.json();
+      trainDataCache = data;
+      populateTrainAccordion(data);
+      refreshOpenDiscrepancyStats();
+    } catch (error) {
+      console.error('Error loading train discrepancies:', error);
+      showListError('zuege-list', `API nicht erreichbar: ${error.message}`);
+    }
+  }
+
+  async function loadDiscrepanciesByDay() {
+    try {
+      const response = await fetch(`${API_BASE_URL}/discrepancies-by-day`);
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const data = await response.json();
+      dayDataCache = data;
+      syncDayDateRangeWithData(data);
+      populateDayAccordion(data);
+      applyFilters('tage');
+    } catch (error) {
+      console.error('Error loading day discrepancies:', error);
+      showListError('tage-list', `API nicht erreichbar: ${error.message}`);
+    }
+  }
+
+  function getOpenDiscrepancyStats() {
+    if (!Array.isArray(trainDataCache) || trainDataCache.length === 0) {
+      return {
+        total_discrepancies: 0,
+        affected_trains: 0
+      };
+    }
+
+    let totalDiscrepancies = 0;
+    let affectedTrains = 0;
+
+    trainDataCache.forEach(train => {
+      const discrepancies = Array.isArray(train?.discrepancies) ? train.discrepancies : [];
+      const openDiscrepancies = discrepancies.filter(disc => {
+        const key = buildDiscrepancyKey(train?.train_id, disc);
+        return !archivedDiscrepancyKeys.has(key);
+      });
+
+      if (openDiscrepancies.length > 0) {
+        affectedTrains += 1;
+        totalDiscrepancies += openDiscrepancies.length;
+      }
+    });
+
+    return {
+      total_discrepancies: totalDiscrepancies,
+      affected_trains: affectedTrains
+    };
+  }
+
+  function refreshOpenDiscrepancyStats() {
+    updatePageStats(getOpenDiscrepancyStats());
+  }
+
+  // ---- Populate Train Accordion ----
+  function populateTrainAccordion(trains) {
+    const accordionList = document.getElementById('zuege-list');
+    if (!accordionList) return;
+
+    const visibleTrains = trains
+      .map(train => {
+        const openDiscrepancies = train.discrepancies.filter(disc => {
+          const key = buildDiscrepancyKey(train.train_id, disc);
+          return !archivedDiscrepancyKeys.has(key);
+        });
+        return {
+          ...train,
+          discrepancies: openDiscrepancies,
+          discrepancy_count: openDiscrepancies.length
+        };
+      })
+      .filter(train => train.discrepancies.length > 0);
+
+    if (!visibleTrains.length) {
+      accordionList.innerHTML = '<div class="empty-state"><span class="empty-icon">✅</span><span class="empty-title">Keine offenen Diskrepanzen</span></div>';
+      return;
+    }
+    accordionList.innerHTML = ''; // Clear existing items
+
+    visibleTrains.forEach(train => {
+      const item = document.createElement('div');
+      item.className = 'accordion-item';
+      item.dataset.trainId = train.train_id || '';
+
+      const discrepanciesHtml = train.discrepancies
+        .map(disc => {
+          const key = buildDiscrepancyKey(train.train_id, disc);
+          discrepancyIndex.set(key, {
+            trainId: train.train_id,
+            route: train.route,
+            date: disc.date,
+            source: disc.source,
+            discrepancy: stripHtml(disc.text).replace(/\s+/g, ' ').trim()
+          });
+          const remarksHtml = disc.ares_remarks && disc.ares_remarks.length > 0
+            ? `<div class="disc-entry-detail"><span class="detail-label">ARES:</span>${disc.ares_remarks.join(' · ')}</div>`
+            : '';
+          return `
+          <div class="disc-entry" data-disc-key="${key}">
+            <div class="disc-entry-header">
+              <span class="disc-entry-date">${disc.date}</span>
+              <span class="source-tag">${disc.source}</span>
+            </div>
+            <div class="disc-entry-text">
+              ${disc.text}
+            </div>
+            ${remarksHtml}
+            <div class="disc-entry-actions">
+              <button class="btn btn-ghost btn-sm" onclick="openModal('${train.train_id}', '${train.route.split(' → ')[0]}', '${train.route.split(' → ')[1]}', '${disc.date}', '${disc.source}', '${stripHtml(disc.text).replace(/'/g, "\\'")}')">📋 Details</button>
+              <button class="btn btn-success btn-sm" onclick="markDone(this)">✓ Als bearbeitet markieren</button>
+            </div>
+          </div>
+          `;
+        })
+        .join('');
+
+      const isExpanded = expandedTrainIds.has(train.train_id);
+      item.innerHTML = `
+        <div class="accordion-header" onclick="toggleAccordion(this)">
+          <div class="accordion-meta">
+            <span class="train-id">${train.train_id}</span>
+            <span class="train-route">
+              ${train.route}
+            </span>
+            <button class="btn btn-success btn-sm" onclick="markTrainDone(this, event)">✓ Alles als bearbeitet markieren</button>
+            <span class="disc-badge">
+              <span class="disc-count">${train.discrepancy_count} Diskrepanz${train.discrepancy_count !== 1 ? 'en' : ''}</span>
+            </span>
+          </div>
+          <span class="accordion-toggle">▶</span>
+        </div>
+        <div class="accordion-body">
+          ${discrepanciesHtml}
+        </div>
+      `;
+
+      if (isExpanded) {
+        const header = item.querySelector('.accordion-header');
+        const body = item.querySelector('.accordion-body');
+        const toggle = item.querySelector('.accordion-toggle');
+        header?.classList.add('open');
+        body?.classList.add('open');
+        toggle?.classList.add('open');
+      }
+
+      accordionList.appendChild(item);
+    });
+  }
+
+  // ---- Populate Day Accordion ----
+  function populateDayAccordion(days) {
+    const accordionList = document.getElementById('tage-list');
+    if (!accordionList) return;
+
+    const daysInRange = days.filter(day => isDateWithinRange(day.date, dayDateRange.start, dayDateRange.end));
+
+    const visibleDays = daysInRange
+      .map(day => {
+        const openTrains = day.trains
+          .map(train => {
+            const openDiscrepancies = train.discrepancies.filter(disc => {
+              const key = buildDiscrepancyKey(train.train_id, disc);
+              return !archivedDiscrepancyKeys.has(key);
+            });
+            return {
+              ...train,
+              discrepancies: openDiscrepancies
+            };
+          })
+          .filter(train => train.discrepancies.length > 0);
+
+        return {
+          ...day,
+          trains: openTrains,
+          train_count: openTrains.length
+        };
+      })
+      .filter(day => day.trains.length > 0);
+
+    if (!visibleDays.length) {
+      accordionList.innerHTML = '<div class="empty-state"><span class="empty-icon">✅</span><span class="empty-title">Keine offenen Diskrepanzen</span></div>';
+      return;
+    }
+    accordionList.innerHTML = ''; // Clear existing items
+
+    visibleDays.forEach(day => {
+      const item = document.createElement('div');
+      item.className = 'accordion-item';
+      item.dataset.dayDate = day.date || '';
+
+      const trainRowsHtml = day.trains
+        .map(train => {
+          const keys = train.discrepancies.map(disc => {
+            const key = buildDiscrepancyKey(train.train_id, disc);
+            discrepancyIndex.set(key, {
+              trainId: train.train_id,
+              route: train.route,
+              date: disc.date,
+              source: disc.source,
+              discrepancy: stripHtml(disc.text).replace(/\s+/g, ' ').trim()
+            });
+            return key;
+          });
+          const discText = train.discrepancies.map(d => d.text).join('; ');
+          const sources = [...new Set(train.discrepancies.map(d => d.source).filter(Boolean))];
+          const source = sources.length ? sources.join(', ') : 'Unbekannt';
+          const firstDisc = train.discrepancies[0];
+          const discToShow = firstDisc ? stripHtml(firstDisc.text).replace(/'/g, "\\'") : '';
+          return `
+            <div class="day-entry-row" data-disc-keys="${keys.join('@@@')}">
+              <span class="train-id">${train.train_id}</span>
+              <span class="train-route">${train.route}</span>
+              <div style="flex:1"></div>
+              <span class="day-entry-disc">${discText}</span>
+              <span class="source-tag" style="margin-left:10px">${source}</span>
+              <button class="btn btn-ghost btn-sm" style="margin-left:10px" onclick="openModal('${train.train_id}', '${train.route.split(' → ')[0]}', '${train.route.split(' → ')[1]}', '${day.date}', '${source}', '${discToShow}')">📋 Details</button>
+              <button class="btn btn-success btn-sm" style="margin-left:10px" onclick="markDayTrainDone(this)">✓ Als bearbeitet markieren</button>
+            </div>
+          `;
+        })
+        .join('');
+
+      const isExpanded = expandedDayDates.has(day.date);
+      item.innerHTML = `
+        <div class="accordion-header" onclick="toggleAccordion(this)">
+          <div class="accordion-meta">
+            <div class="day-header">
+              <span class="day-label">${formatDate(day.date)}</span>
+            </div>
+            <button class="btn btn-success btn-sm" onclick="markDayDone(this, event)">✓ Alles als bearbeitet markieren</button>
+            <span class="disc-badge">
+              <span class="day-trains-badge">${day.train_count} Züge betroffen</span>
+            </span>
+          </div>
+          <span class="accordion-toggle">▶</span>
+        </div>
+        <div class="accordion-body">
+          <div class="day-entry">
+            ${trainRowsHtml}
+          </div>
+        </div>
+      `;
+
+      if (isExpanded) {
+        const header = item.querySelector('.accordion-header');
+        const body = item.querySelector('.accordion-body');
+        const toggle = item.querySelector('.accordion-toggle');
+        header?.classList.add('open');
+        body?.classList.add('open');
+        toggle?.classList.add('open');
+      }
+
+      accordionList.appendChild(item);
+    });
+  }
+
+  // ---- Format Date ----
+  function formatDate(dateStr) {
+    try {
+      const [year, month, day] = dateStr.split('-');
+      const date = new Date(year, parseInt(month) - 1, day);
+      const days = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
+      const dayName = days[date.getDay()];
+      return `${dayName}, ${day}.${month}.${year}`;
+    } catch {
+      return dateStr;
+    }
+  }
+
+  // ---- Update Page Stats ----
+  function updatePageStats(stats) {
+    const descEl = document.querySelector('#panel-zuege .page-desc');
+    if (descEl) {
+      descEl.textContent = `${stats.total_discrepancies} offene Diskrepanzen in ${stats.affected_trains} Zügen`;
+    }
+  }
+
   // ---- Panel switching ----
   function switchPanel(id) {
     document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
@@ -1986,6 +2745,13 @@
   // Set initial active nav
   document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('nav-zuege').classList.add('active');
+    initializeDayDateRangeControl();
+    updateDayDateRangeLabel();
+    restoreArchiveState();
+    
+    // Load data from API
+    loadDiscrepanciesByTrain();
+    loadDiscrepanciesByDay();
   });
 
   // ---- Accordion toggle ----
@@ -1993,15 +2759,25 @@
     const body = header.nextElementSibling;
     const toggle = header.querySelector('.accordion-toggle');
     const isOpen = header.classList.contains('open');
+    const item = header.closest('.accordion-item');
+    const list = header.closest('.accordion-list');
+    const isTrainList = list?.id === 'zuege-list';
+    const isDayList = list?.id === 'tage-list';
+    const trainId = item?.dataset?.trainId;
+    const dayDate = item?.dataset?.dayDate;
 
     if (isOpen) {
       header.classList.remove('open');
       body.classList.remove('open');
       toggle.classList.remove('open');
+      if (isTrainList && trainId) expandedTrainIds.delete(trainId);
+      if (isDayList && dayDate) expandedDayDates.delete(dayDate);
     } else {
       header.classList.add('open');
       body.classList.add('open');
       toggle.classList.add('open');
+      if (isTrainList && trainId) expandedTrainIds.add(trainId);
+      if (isDayList && dayDate) expandedDayDates.add(dayDate);
     }
   }
 
@@ -2035,27 +2811,115 @@
     }
   }
 
+  // ---- Update badge count ----
+  function updateBadgeCount(item) {
+    if (!item) return;
+    const badgeEl = item.querySelector('.disc-count');
+    const entryCount = item.querySelectorAll('.disc-entry').length;
+    if (badgeEl) {
+      badgeEl.textContent = entryCount === 1 ? '1 Diskrepanz' : `${entryCount} Diskrepanzen`;
+    }
+  }
+
+  // ---- Update archive badge count ----
+  function updateArchiveBadge() {
+    const archiveEntries = document.getElementById('archiveEntries');
+    const archiveCount = archiveEntries ? archiveEntries.querySelectorAll('.archive-entry').length : 0;
+    const navBadge = document.querySelector('.nav-badge.neutral');
+    if (navBadge) {
+      navBadge.textContent = archiveCount;
+    }
+  }
+
   // ---- Mark as done ----
+  function archiveDiscEntry(entry) {
+    if (!entry) return false;
+    const key = entry.dataset.discKey;
+    return archiveByKeys([key]) > 0;
+  }
+
   function markDone(btn) {
     const entry = btn.closest('.disc-entry');
-    entry.style.opacity = '0.5';
-    entry.style.transition = 'opacity 0.3s';
-    btn.textContent = '✓ Erledigt';
-    btn.disabled = true;
-    showToast('Eintrag als bearbeitet markiert. ');
-    setTimeout(() => {
-      entry.style.opacity = '1';
-    }, 1500);
+    if (!archiveDiscEntry(entry)) return;
+    showToast('Eintrag ins Archiv verschoben.');
+  }
+
+  function markTrainDone(btn, event) {
+    if (event) event.stopPropagation();
+
+    const item = btn.closest('.accordion-item');
+    if (!item) return;
+
+    const keys = Array.from(item.querySelectorAll('.disc-entry'))
+      .map(entry => entry.dataset.discKey)
+      .filter(Boolean);
+
+    if (!keys.length) {
+      showToast('Keine offenen Einträge für diesen Zug.');
+      return;
+    }
+
+    const archivedCount = archiveByKeys(keys);
+    showToast(`${archivedCount} Einträge ins Archiv verschoben.`);
+  }
+
+  function markDayTrainDone(btn) {
+    const row = btn.closest('.day-entry-row');
+    if (!row) return;
+
+    const keys = (row.dataset.discKeys || '')
+      .split('@@@')
+      .map(key => key.trim())
+      .filter(Boolean);
+
+    if (!keys.length) {
+      showToast('Keine offenen Einträge für diesen Tag.');
+      return;
+    }
+
+    const archivedCount = archiveByKeys(keys);
+    showToast(`${archivedCount} Einträge ins Archiv verschoben.`);
+  }
+
+  function markDayDone(btn, event) {
+    if (event) event.stopPropagation();
+
+    const item = btn.closest('.accordion-item');
+    if (!item) return;
+
+    const keys = Array.from(item.querySelectorAll('.day-entry-row'))
+      .flatMap(row => (row.dataset.discKeys || '').split('@@@'))
+      .map(key => key.trim())
+      .filter(Boolean);
+
+    if (!keys.length) {
+      showToast('Keine offenen Einträge für diesen Tag.');
+      return;
+    }
+
+    const archivedCount = archiveByKeys([...new Set(keys)]);
+    showToast(`${archivedCount} Einträge ins Archiv verschoben.`);
   }
 
   // ---- Dataload button ----
+  function updateDataloadTimestamp(date) {
+    const timestampEl = document.querySelector('.dataload-timestamp');
+    if (!timestampEl) return;
+
+    const d = date || new Date();
+    const pad = n => String(n).padStart(2, '0');
+    timestampEl.textContent = `${pad(d.getDate())}.${pad(d.getMonth() + 1)}.${d.getFullYear()}, ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  }
+
   function triggerDataload() {
+    const clickTimestamp = new Date();
     const btn = document.getElementById('dataloadBtn');
     btn.disabled = true;
     btn.innerHTML = '<div class="spinner"></div> Wird geladen…';
     setTimeout(() => {
       btn.disabled = false;
       btn.innerHTML = '🔄 Neuen Dataload anfordern';
+      updateDataloadTimestamp(clickTimestamp);
       showToast('✓ Dataload #2452 erfolgreich abgeschlossen. 54 Züge geprüft.');
     }, 2800);
   }
@@ -2087,7 +2951,423 @@
       btn.classList.add('active');
     });
   });
+
+  // ---- Search and Filter Logic ----
+  function applyFilters(panelId) {
+    const panel = document.getElementById(`panel-${panelId}`);
+    if (!panelId || !panel) return;
+
+    // Get search input and source filter for this panel
+    const searchInputs = panel.querySelectorAll('.search-input');
+    const filterSelects = panel.querySelectorAll('.filter-select');
+
+    if (filterSelects.length === 0) return;
+
+    const searchValue = (searchInputs[0]?.value || '').toLowerCase().trim();
+    const sourceFilter = filterSelects[0].value; // First select is source filter
+    const dateQuickFilter = filterSelects[1]?.value || 'Datum: Alle';
+
+    function matchesQuickDate(dateValue, quickFilter) {
+      if (!quickFilter || quickFilter === 'Datum: Alle') return true;
+
+      const normalized = normalizeDateToIso(dateValue);
+      if (!normalized) return false;
+
+      const now = new Date();
+      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      const dateObj = new Date(`${normalized}T00:00:00`);
+
+      if (quickFilter === 'Heute') {
+        return dateObj.getTime() === today.getTime();
+      }
+
+      const dayOfWeek = today.getDay();
+      const mondayOffset = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+      const thisWeekStart = new Date(today);
+      thisWeekStart.setDate(today.getDate() + mondayOffset);
+      const thisWeekEnd = new Date(thisWeekStart);
+      thisWeekEnd.setDate(thisWeekStart.getDate() + 6);
+
+      if (quickFilter === 'Diese Woche') {
+        return dateObj >= thisWeekStart && dateObj <= thisWeekEnd;
+      }
+
+      if (quickFilter === 'Nächste Woche') {
+        const nextWeekStart = new Date(thisWeekStart);
+        nextWeekStart.setDate(thisWeekStart.getDate() + 7);
+        const nextWeekEnd = new Date(nextWeekStart);
+        nextWeekEnd.setDate(nextWeekStart.getDate() + 6);
+        return dateObj >= nextWeekStart && dateObj <= nextWeekEnd;
+      }
+
+      return true;
+    }
+
+    // For "Züge" panel
+    if (panelId === 'zuege') {
+      const items = panel.querySelectorAll('.accordion-item');
+      items.forEach(item => {
+        const trainId = item.querySelector('.train-id')?.textContent.toLowerCase() || '';
+        const trainRoute = item.querySelector('.train-route')?.textContent.toLowerCase() || '';
+        
+        // Check if train matches search criteria
+        const matchesSearch = !searchValue || 
+                             trainId.includes(searchValue) || 
+                             trainRoute.includes(searchValue);
+
+        // Check if entries match source and date filters
+        const entries = item.querySelectorAll('.disc-entry');
+        const matchingEntries = Array.from(entries).filter(entry => {
+          const sourceTag = entry.querySelector('.source-tag')?.textContent.trim() || '';
+          const entryDate = entry.querySelector('.disc-entry-date')?.textContent.trim() || '';
+
+          const sourceFilterValue = sourceFilter.split(': ')[1] || sourceFilter;
+          const sourceMatch = sourceFilter === 'Quelle: Alle' ||
+            sourceTag === sourceFilterValue;
+
+          const dateMatch = matchesQuickDate(entryDate, dateQuickFilter);
+          entry.style.display = (sourceMatch && dateMatch) ? 'flex' : 'none';
+          return sourceMatch && dateMatch;
+        });
+
+        const matchesSourceAndDate = matchingEntries.length > 0;
+
+        // Show/hide accordion item
+        item.style.display = (matchesSearch && matchesSourceAndDate) ? 'block' : 'none';
+      });
+    }
+    
+    // For "Tage" panel
+    if (panelId === 'tage') {
+      const items = panel.querySelectorAll('.accordion-item');
+      items.forEach(item => {
+        const dayEntries = item.querySelectorAll('.day-entry-row');
+        let visibleCount = 0;
+
+        // Check each day-entry-row
+        dayEntries.forEach(entry => {
+          const trainId = entry.querySelector('.train-id')?.textContent.toLowerCase() || '';
+          const trainRoute = entry.querySelector('.train-route')?.textContent.toLowerCase() || '';
+          
+          const matchesSearch = !searchValue || 
+                               trainId.includes(searchValue) || 
+                               trainRoute.includes(searchValue);
+
+          let matchesSource = sourceFilter === 'Quelle: Alle';
+          if (!matchesSource) {
+            const sourceTag = entry.querySelector('.source-tag')?.textContent.trim() || '';
+            matchesSource = sourceTag.split(',').map(s => s.trim()).includes(sourceFilter.split(': ')[1] || sourceFilter);
+          }
+
+          if (matchesSearch && matchesSource) {
+            entry.style.display = 'flex';
+            visibleCount++;
+          } else {
+            entry.style.display = 'none';
+          }
+        });
+
+        // Hide day accordion if no visible entries
+        item.style.display = visibleCount > 0 ? 'block' : 'none';
+      });
+    }
+  }
+
+  // Add event listeners for search inputs
+  document.querySelectorAll('.search-input').forEach(input => {
+    input.addEventListener('input', (e) => {
+      // Determine which panel this search input belongs to
+      const panel = e.target.closest('.panel');
+      if (!panel) return;
+      
+      const panelId = panel.id.replace('panel-', '');
+      applyFilters(panelId);
+    });
+  });
+
+  // Add event listeners for source filter dropdowns
+  document.querySelectorAll('#panel-zuege .filter-select').forEach((select, index) => {
+    if (index === 0 || index === 1) { // Source and date quick filter
+      select.addEventListener('change', () => {
+        applyFilters('zuege');
+      });
+    }
+  });
+
+  document.querySelectorAll('#panel-tage .filter-select').forEach((select, index) => {
+    if (index === 0) { // Only first select is source filter
+      select.addEventListener('change', () => {
+        applyFilters('tage');
+      });
+    }
+  });
+
+  // ---- Initialize badge counts on page load ----
+  document.querySelectorAll('.accordion-item').forEach(item => {
+    updateBadgeCount(item);
+  });
+
+  // ---- Initialize archive badge count ----
+  updateArchiveBadge();
+
+  // =========================================
+  // MODAL LOGIC
+  // =========================================
+
+  let currentTrainId = null;
+  let currentTrainDate = null;
+  let currentDiscrepancy = null;
+
+  function openModal(trainId, from, to, date, source, disc) {
+    currentTrainId = trainId;
+    currentTrainDate = date;
+
+    document.getElementById('modalTrainBadge').textContent  = '🚆 ' + trainId;
+    document.getElementById('modalTitle').textContent       = from + ' → ' + to;
+    document.getElementById('modalDate').textContent        = date;
+    document.getElementById('modalSource').textContent      = source;
+    document.getElementById('modalDisc').textContent        = disc;
+    document.getElementById('modalBannerDisc').textContent  = disc;
+    document.getElementById('modalBannerSource').textContent = source;
+
+    // Show loading, hide matrix
+    document.getElementById('matrixLoading').style.display  = 'flex';
+    document.getElementById('matrixContent').style.display  = 'none';
+
+    // Open overlay
+    document.getElementById('detailModal').classList.add('open');
+    document.body.style.overflow = 'hidden';
+
+    // Simulate backend delay
+    const delay = 400 + Math.random() * 500;
+    setTimeout(() => {
+      loadTrainMatrix(trainId, date);
+      document.getElementById('matrixLoading').style.display = 'none';
+      document.getElementById('matrixContent').style.display = 'block';
+    }, delay);
+  }
+
+  function closeModal() {
+    document.getElementById('detailModal').classList.remove('open');
+    document.body.style.overflow = '';
+    currentTrainId = null;
+    currentTrainDate = null;
+  }
+
+  function handleOverlayClick(e) {
+    if (e.target === document.getElementById('detailModal')) {
+      closeModal();
+    }
+  }
+
+  // Close on Escape key
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeModal();
+  });
+
+  function markDoneFromModal() {
+    closeModal();
+    showToast('✓ Eintrag als bearbeitet markiert und ins Archiv verschoben.');
+  }
+
+  // =========================================
+  // MATRIX BUILDER
+  // =========================================
+
+  async function loadTrainMatrix(trainId, date) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/train-details/${trainId}/${date}`);
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+      const data = await response.json();
+      buildMatrix(data);
+    } catch (error) {
+      console.error('Error loading train details:', error);
+      document.getElementById('matrixContent').innerHTML = 
+        `<div style="padding:40px; text-align:center; color:var(--color-text-muted);">
+          ⚠️ Fehler beim Laden der Fahrtweg-Daten: ${error.message}
+        </div>`;
+    }
+  }
+
+  function buildMatrix(trainData) {
+    const table = document.getElementById('matrixTable');
+    table.innerHTML = '';
+
+    const table_body = document.createElement('tbody');
+
+    // ---- ROW 1: Column group headers ----
+    const headRow1 = document.createElement('tr');
+
+    // Route column (rowspan 2)
+    const thRoute = document.createElement('th');
+    thRoute.className = 'col-group-header';
+    thRoute.rowSpan = 2;
+    thRoute.textContent = 'Fahrtweg';
+    thRoute.style.verticalAlign = 'middle';
+    headRow1.appendChild(thRoute);
+
+    const groupDefs = [
+      { label: '💺 Sitzplätze SBB', color: '#2563EB' },
+      { label: '💺 Sitzplätze ÖBB', color: '#7C3AED' },
+      { label: '💺 Sitzplätze DB',  color: '#065F46' },
+      { label: '⚙ Status',           color: '#92400E', span: 1 },
+    ];
+
+    groupDefs.forEach(def => {
+      const th = document.createElement('th');
+      th.className = 'col-group-header';
+      th.colSpan = def.span || 2;
+      th.textContent = def.label;
+      th.style.background = def.color;
+      headRow1.appendChild(th);
+    });
+
+    table.appendChild(headRow1);
+
+    // ---- ROW 2: Sub-headers ----
+    const headRow2 = document.createElement('tr');
+
+    const operators = ['SBB', 'ÖBB', 'DB'];
+    operators.forEach((op, gi) => {
+      const isLast = (gi === operators.length - 1);
+
+      const thArr = document.createElement('th');
+      thArr.className = 'col-sub-header sub-arr';
+      thArr.textContent = 'Ank.';
+      headRow2.appendChild(thArr);
+
+      const thDep = document.createElement('th');
+      thDep.className = 'col-sub-header sub-dep' + (isLast ? ' col-group-border-right' : '');
+      thDep.textContent = 'Abf.';
+      headRow2.appendChild(thDep);
+    });
+
+    // Status header
+    const thStatus = document.createElement('th');
+    thStatus.className = 'col-sub-header';
+    thStatus.textContent = 'Status';
+    headRow2.appendChild(thStatus);
+
+    table.appendChild(headRow2);
+
+    // ---- DATA ROWS ----
+    trainData.stops.forEach((stop, si) => {
+      const tr = document.createElement('tr');
+
+      // Station cell
+      const tdStation = document.createElement('td');
+      tdStation.className = 'station-cell';
+      tdStation.innerHTML = `
+        <div class="station-inner">
+          <div class="station-dot"></div>
+          <div class="station-name-wrap">
+            <div class="station-name">${stop.halt}</div>
+            <div class="station-km">${stop.km}</div>
+          </div>
+        </div>
+      `;
+      tr.appendChild(tdStation);
+
+      // Time columns for each operator
+      operators.forEach((op, gi) => {
+        const isLastOp = (gi === operators.length - 1);
+        const times = stop.operators[op] || {};
+
+        // Arrival
+        const tdArr = document.createElement('td');
+        tdArr.className = 'time-cell';
+        if (times.arrival) {
+          tdArr.innerHTML = `<span class="time-value arr">${times.arrival}</span>`;
+        } else {
+          tdArr.innerHTML = `<span class="time-value empty">–</span>`;
+        }
+        tr.appendChild(tdArr);
+
+        // Departure
+        const tdDep = document.createElement('td');
+        tdDep.className = 'time-cell' + (isLastOp ? ' col-group-border-right' : '');
+        if (times.departure) {
+          tdDep.innerHTML = `<span class="time-value dep">${times.departure}</span>`;
+        } else {
+          tdDep.innerHTML = `<span class="time-value empty">–</span>`;
+        }
+        tr.appendChild(tdDep);
+      });
+
+      // Status column
+      const tdStatus = document.createElement('td');
+      tdStatus.className = 'ares-cell';
+      const status = stop.ares_status || 'OK';
+      let statusClass = 'ares-ok';
+      if (status === '✗ Fehlt') statusClass = 'ares-error';
+      else if (status.includes('⚠')) statusClass = 'ares-warning';
+      tdStatus.innerHTML = `<span class="ares-tag ${statusClass}">${status}</span>`;
+      tr.appendChild(tdStatus);
+
+      table.appendChild(tr);
+    });
+  }
+
 </script>
+
+<!-- ===================== DETAIL MODAL ===================== -->
+<div class="modal-overlay" id="detailModal" onclick="handleOverlayClick(event)">
+  <div class="modal">
+
+    <div class="modal-header">
+      <div class="modal-header-info">
+        <div class="modal-train-badge" id="modalTrainBadge">🚆 IC 723</div>
+        <div class="modal-title" id="modalTitle">Zürich HB → Genève-Aéroport</div>
+        <div class="modal-meta">
+          <div class="modal-meta-item">📅 <strong id="modalDate">24.06.2026</strong></div>
+          <div class="modal-meta-item">⚠️ Quelle: <strong id="modalSource">NeTS-AT</strong></div>
+          <div class="modal-meta-item">🔍 <strong id="modalDisc">Abfahrtszeit weicht um +2 Min ab</strong></div>
+        </div>
+      </div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+
+    <div class="modal-disc-banner">
+      <span class="modal-disc-banner-icon">⚠️</span>
+      <span class="modal-disc-banner-text">
+        Gemeldete Diskrepanz: <strong id="modalBannerDisc"></strong>
+        &nbsp;·&nbsp; Quelle: <strong id="modalBannerSource"></strong>
+      </span>
+    </div>
+
+    <div class="modal-body">
+
+      <!-- Loading state -->
+      <div class="matrix-loading" id="matrixLoading">
+        <div class="matrix-spinner"></div>
+        <div class="matrix-loading-text">Lade Fahrtweg-Daten vom Backend…</div>
+      </div>
+
+      <!-- Matrix (hidden while loading) -->
+      <div id="matrixContent" style="display:none;">
+        <div class="matrix-wrapper">
+          <table class="matrix-table" id="matrixTable"></table>
+        </div>
+        <div class="matrix-legend">
+          <span class="legend-title">Legende:</span>
+          <span class="legend-item"><span class="legend-dot legend-arr"></span> Ankunft</span>
+          <span class="legend-item"><span class="legend-dot legend-dep"></span> Abfahrt</span>
+          <span class="legend-item"><span class="legend-dot legend-disc"></span> Abweichung (Warnung)</span>
+          <span class="legend-item"><span class="legend-dot legend-err"></span> Abweichung (Fehler)</span>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal()">Schliessen</button>
+      <button class="btn btn-success" onclick="markDoneFromModal()">✓ Als bearbeitet markieren</button>
+    </div>
+
+  </div>
+</div>
 
 </body>
 </html>

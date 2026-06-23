@@ -1,3 +1,7 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "dreamteam"
 version = "0.1.0"
@@ -10,9 +14,13 @@ dependencies = [
     "pyyaml>=6.0.3",
     "requests>=2.34.2",
     "pandas>=3.0.3",
-    "openpyxl>=3.1.5"
+    "openpyxl>=3.1.5",
+    "flask>=3.0.0"
 ]
 
 
+[tool.setuptools]
+package-dir = {"" = "src"}
+
 [tool.setuptools.packages.find]
-where = ["src/dreamteam"]
+where = ["src"]
