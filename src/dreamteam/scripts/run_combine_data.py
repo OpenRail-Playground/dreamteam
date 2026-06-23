@@ -3,10 +3,10 @@ from pathlib import Path
 
 path_ares = Path("data/ares_cleaned.csv")
 path_fahrplan_zuege_sbb = Path("data/sbb_data.csv")
-path_fahrplan_zuege_oebb = Path("data/sbb_data.csv")
+path_fahrplan_zuege_oebb = Path("data/oebb_data.csv")
 path_fahrplan_zuege_db = Path("data/db_data.csv")
 path_fahrplan_zueglaeufe_sbb = Path("data/sbb_data.csv")
-path_fahrplan_zueglaeufe_oebb = Path("data/sbb_data.csv")
+path_fahrplan_zueglaeufe_oebb = Path("data/oebb_data.csv")
 path_fahrplan_zueglaeufe_db = Path("data/db_data.csv")
 path_output_zuege = Path("data/output_zuege.csv")
 path_output_zueglaeufe = Path("data/output_zueglaeufe.csv")
