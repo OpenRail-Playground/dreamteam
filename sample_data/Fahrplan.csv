@@ -1,1 +1,14 @@
-﻿Version;Datum;Zugnummer
+﻿Version;Datum;Zugnummer;Halt;an;ab;Datenquelle
+1;2026-07-01;459;Zürich Hbf;;20:00;SBB
+1;2026-07-01;459;Basel SBB;20:55;21:00;SBB
+1;2026-07-01;459;Basel Bad;21:15;21:20;SBB
+1;2026-07-01;459;Karlsruhe;23:30;23:30;SBB
+1;2026-07-01;459;Berlin Hbf;08:00;;SBB
+1;2026-07-02;459;Zürich Hbf;20:00;20:00;SBB
+1;2026-07-02;459;Basel SBB;20:55;21:00;SBB
+1;2026-07-02;459;Basel Bad;21:15;21:20;SBB
+1;2026-07-02;459;Freiburg;21:59;22:00;SBB
+1;2026-07-02;459;Offenburg;22:15;22:20;SBB
+1;2026-07-02;459;Baden-Baden;22:45;22:50;SBB
+1;2026-07-02;459;Karlsruhe;23:25;23:30;SBB
+1;2026-07-02;459;Berlin Hbf;08:00;;SBB
