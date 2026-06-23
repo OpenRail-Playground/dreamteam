@@ -520,14 +520,6 @@
       border-bottom: 1px solid var(--color-border);
     }
 
-    .accordion-checkbox {
-      width: 16px;
-      height: 16px;
-      cursor: pointer;
-      accent-color: var(--color-primary);
-      flex-shrink: 0;
-    }
-
     .accordion-meta {
       flex: 1;
       display: flex;
@@ -564,8 +556,8 @@
     }
 
     .disc-count {
-      background: var(--color-primary-light);
-      color: var(--color-primary);
+      background: #FEE2E2;
+      color: #DC2626;
       font-size: 12px;
       font-weight: 700;
       padding: 2px 9px;
@@ -573,8 +565,8 @@
     }
 
     .disc-count.single {
-      background: #FEF3C7;
-      color: #B45309;
+      background: #FEE2E2;
+      color: #DC2626;
     }
 
     .disc-count.many {
@@ -648,6 +640,21 @@
       color: var(--color-primary);
     }
 
+    .disc-entry-detail {
+      font-size: 12px;
+      color: var(--color-text-muted);
+      background: #F3F4F6;
+      border-radius: var(--radius-sm);
+      padding: 6px 10px;
+      line-height: 1.5;
+    }
+
+    .disc-entry-detail .detail-label {
+      font-weight: 700;
+      color: var(--color-text);
+      margin-right: 4px;
+    }
+
     .disc-entry-actions {
       display: flex;
       align-items: center;
@@ -711,33 +718,6 @@
       font-size: 12.5px;
       color: var(--color-text-muted);
       flex: 1;
-    }
-
-    /* ===========================
-       BULK ACTION BAR
-    =========================== */
-    .bulk-bar {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      background: var(--color-surface);
-      border: 1px solid var(--color-border);
-      border-radius: var(--radius-md);
-      padding: 12px 18px;
-      box-shadow: var(--shadow-sm);
-    }
-
-    .bulk-bar.hidden {
-      display: none;
-    }
-
-    .bulk-info {
-      font-size: 13px;
-      color: var(--color-text-muted);
-    }
-
-    .bulk-info strong {
-      color: var(--color-text);
     }
 
     /* ===========================
@@ -1219,7 +1199,7 @@
       <div class="header-logo">🚆</div>
       <div>
         <div class="header-title">Fahrplan-Diskrepanz-Analyzer</div>
-        <div class="header-subtitle">Vergleich: NeTS-AT · CIS · Hafas</div>
+        <div class="header-subtitle">Vergleich: SBB · ÖBB · DB</div>
       </div>
     </div>
 
@@ -1227,7 +1207,6 @@
       <div class="dataload-info">
         <span class="dataload-label">Letzter Dataload:</span>
         <span class="dataload-timestamp">23.06.2026, 11:42</span>
-        <span class="status-pill fresh">frisch</span>
       </div>
 
       <button class="btn btn-primary" id="dataloadBtn" onclick="triggerDataload()">
@@ -1248,13 +1227,11 @@
     <a class="nav-item" onclick="switchPanel('zuege')" id="nav-zuege">
       <span class="nav-icon">🔍</span>
       <span class="nav-label">Pro Zug</span>
-      <span class="nav-badge">42</span>
     </a>
 
     <a class="nav-item" onclick="switchPanel('tage')" id="nav-tage">
       <span class="nav-icon">📅</span>
       <span class="nav-label">Pro Tag</span>
-      <span class="nav-badge">12</span>
     </a>
 
     <div class="nav-divider"></div>
@@ -1290,7 +1267,7 @@
       <div class="page-header">
         <div>
           <h1 class="page-title">Diskrepanzen pro Zug</h1>
-          <p class="page-desc">42 offene Diskrepanzen in 18 Zügen</p>
+          <p class="page-desc">Laden...</p>
         </div>
       </div>
 
@@ -1303,9 +1280,9 @@
 
         <select class="filter-select">
           <option>Quelle: Alle</option>
-          <option>NeTS-AT</option>
-          <option>CIS</option>
-          <option>Hafas</option>
+          <option>SBB</option>
+          <option>ÖBB</option>
+          <option>DB</option>
         </select>
 
         <select class="filter-select">
@@ -1323,194 +1300,9 @@
       </div>
 
       <!-- Accordion List -->
-      <div class="accordion-list">
-
-        <!-- Item 1: IC 723 -->
-        <div class="accordion-item">
-          <div class="accordion-header" onclick="toggleAccordion(this)">
-            <input type="checkbox" class="accordion-checkbox" onclick="event.stopPropagation()" />
-            <div class="accordion-meta">
-              <span class="train-id">IC 723</span>
-              <span class="train-route">
-                Zürich HB
-                <span class="route-arrow">→</span>
-                Genève-Aéroport
-              </span>
-              <span class="disc-badge">
-                <span class="disc-count many">3 Diskrepanzen</span>
-              </span>
-            </div>
-            <span class="accordion-toggle">▶</span>
-          </div>
-          <div class="accordion-body">
-            <!-- Entry 1 -->
-            <div class="disc-entry">
-              <div class="disc-entry-header">
-                <input type="checkbox" class="accordion-checkbox" />
-                <span class="disc-entry-date">24.06.2026</span>
-                <span class="source-tag">NeTS-AT</span>
-              </div>
-              <div class="disc-entry-text">
-                <strong>Abfahrtszeit</strong> weicht um <strong>+2 Min</strong> ab gegenüber CIS und Hafas.
-              </div>
-              <div class="disc-entry-actions">
-                <button class="btn btn-ghost btn-sm">📋 Details</button>
-                <button class="btn btn-success btn-sm" onclick="markDone(this)">✓ Als bearbeitet markieren</button>
-              </div>
-            </div>
-            <!-- Entry 2 -->
-            <div class="disc-entry">
-              <div class="disc-entry-header">
-                <input type="checkbox" class="accordion-checkbox" />
-                <span class="disc-entry-date">25.06.2026</span>
-                <span class="source-tag">CIS</span>
-              </div>
-              <div class="disc-entry-text">
-                Halt <strong>Bern</strong> fehlt in CIS, vorhanden in NeTS-AT und Hafas.
-              </div>
-              <div class="disc-entry-actions">
-                <button class="btn btn-ghost btn-sm">📋 Details</button>
-                <button class="btn btn-success btn-sm" onclick="markDone(this)">✓ Als bearbeitet markieren</button>
-              </div>
-            </div>
-            <!-- Entry 3 -->
-            <div class="disc-entry">
-              <div class="disc-entry-header">
-                <input type="checkbox" class="accordion-checkbox" />
-                <span class="disc-entry-date">26.06.2026</span>
-                <span class="source-tag">Hafas</span>
-              </div>
-              <div class="disc-entry-text">
-                Ankunftszeit in <strong>Genève-Aéroport</strong> weicht um <strong>−1 Min</strong> ab gegenüber NeTS-AT.
-              </div>
-              <div class="disc-entry-actions">
-                <button class="btn btn-ghost btn-sm">📋 Details</button>
-                <button class="btn btn-success btn-sm" onclick="markDone(this)">✓ Als bearbeitet markieren</button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Item 2: IR 1567 -->
-        <div class="accordion-item">
-          <div class="accordion-header open" onclick="toggleAccordion(this)">
-            <input type="checkbox" class="accordion-checkbox" onclick="event.stopPropagation()" />
-            <div class="accordion-meta">
-              <span class="train-id">IR 1567</span>
-              <span class="train-route">
-                Basel SBB
-                <span class="route-arrow">→</span>
-                Locarno
-              </span>
-              <span class="disc-badge">
-                <span class="disc-count single">1 Diskrepanz</span>
-              </span>
-            </div>
-            <span class="accordion-toggle open">▶</span>
-          </div>
-          <div class="accordion-body open">
-            <div class="disc-entry">
-              <div class="disc-entry-header">
-                <input type="checkbox" class="accordion-checkbox" />
-                <span class="disc-entry-date">24.06.2026</span>
-                <span class="source-tag">NeTS-AT</span>
-              </div>
-              <div class="disc-entry-text">
-                <strong>Abfahrtszeit</strong> weicht um <strong>+2 Min</strong> ab gegenüber CIS und Hafas.
-              </div>
-              <div class="disc-entry-actions">
-                <button class="btn btn-ghost btn-sm">📋 Details</button>
-                <button class="btn btn-success btn-sm" onclick="markDone(this)">✓ Als bearbeitet markieren</button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Item 3: IC 921 -->
-        <div class="accordion-item">
-          <div class="accordion-header" onclick="toggleAccordion(this)">
-            <input type="checkbox" class="accordion-checkbox" onclick="event.stopPropagation()" />
-            <div class="accordion-meta">
-              <span class="train-id">IC 921</span>
-              <span class="train-route">
-                Brig
-                <span class="route-arrow">→</span>
-                Romanshorn
-              </span>
-              <span class="disc-badge">
-                <span class="disc-count many">5 Diskrepanzen</span>
-              </span>
-            </div>
-            <span class="accordion-toggle">▶</span>
-          </div>
-          <div class="accordion-body">
-            <div class="disc-entry">
-              <div class="disc-entry-header">
-                <input type="checkbox" class="accordion-checkbox" />
-                <span class="disc-entry-date">23.06.2026</span>
-                <span class="source-tag">CIS</span>
-              </div>
-              <div class="disc-entry-text">
-                Zusatzhalt <strong>Spiez</strong> in Hafas nicht vorhanden. Mögliche Planungsabweichung.
-              </div>
-              <div class="disc-entry-actions">
-                <button class="btn btn-ghost btn-sm">📋 Details</button>
-                <button class="btn btn-success btn-sm" onclick="markDone(this)">✓ Als bearbeitet markieren</button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Item 4: RE 3291 -->
-        <div class="accordion-item">
-          <div class="accordion-header" onclick="toggleAccordion(this)">
-            <input type="checkbox" class="accordion-checkbox" onclick="event.stopPropagation()" />
-            <div class="accordion-meta">
-              <span class="train-id">RE 3291</span>
-              <span class="train-route">
-                Luzern
-                <span class="route-arrow">→</span>
-                Olten
-              </span>
-              <span class="disc-badge">
-                <span class="disc-count">2 Diskrepanzen</span>
-              </span>
-            </div>
-            <span class="accordion-toggle">▶</span>
-          </div>
-          <div class="accordion-body">
-            <div class="disc-entry">
-              <div class="disc-entry-header">
-                <input type="checkbox" class="accordion-checkbox" />
-                <span class="disc-entry-date">27.06.2026</span>
-                <span class="source-tag">Hafas</span>
-              </div>
-              <div class="disc-entry-text">
-                Fahrtrichtungswechsel in <strong>Zofingen</strong> nicht in NeTS-AT erfasst.
-              </div>
-              <div class="disc-entry-actions">
-                <button class="btn btn-ghost btn-sm">📋 Details</button>
-                <button class="btn btn-success btn-sm" onclick="markDone(this)">✓ Als bearbeitet markieren</button>
-              </div>
-            </div>
-          </div>
-        </div>
-
+      <div class="accordion-list" id="zuege-list">
+        <div class="empty-state"><span class="empty-icon">⏳</span><span class="empty-title">Daten werden geladen…</span></div>
       </div><!-- /accordion-list -->
-
-      <!-- Bulk Action Bar -->
-      <div class="bulk-bar" id="bulkBar">
-        <span class="bulk-info">
-          Auswahl: <strong>2 Züge / 4 Einträge</strong>
-        </span>
-        <div class="toolbar-spacer"></div>
-        <button class="btn btn-success" onclick="showToast()">
-          ✓ Markierte ins Archiv verschieben
-        </button>
-        <button class="btn btn-secondary" onclick="document.getElementById('bulkBar').classList.add('hidden')">
-          Auswahl aufheben
-        </button>
-      </div>
 
     </section><!-- /panel-zuege -->
 
@@ -1521,7 +1313,7 @@
       <div class="page-header">
         <div>
           <h1 class="page-title">Diskrepanzen pro Tag</h1>
-          <p class="page-desc">Zeitraum: 20.06.–30.06.2026 · 12 Tage mit Diskrepanzen</p>
+          <p class="page-desc">Laden...</p>
         </div>
       </div>
 
@@ -1547,122 +1339,8 @@
       </div>
 
       <!-- Day Accordion -->
-      <div class="accordion-list">
-
-        <!-- Mo 24.06 -->
-        <div class="accordion-item">
-          <div class="accordion-header open" onclick="toggleAccordion(this)">
-            <input type="checkbox" class="accordion-checkbox" onclick="event.stopPropagation()" />
-            <div class="accordion-meta">
-              <div class="day-header">
-                <span class="day-label">Mo, 24.06.2026</span>
-              </div>
-              <span class="disc-badge">
-                <span class="day-trains-badge">12 Züge betroffen</span>
-              </span>
-            </div>
-            <span class="accordion-toggle open">▶</span>
-          </div>
-          <div class="accordion-body open">
-            <div class="day-entry">
-              <div class="day-entry-row">
-                <input type="checkbox" class="accordion-checkbox" />
-                <span class="train-id">IR 1567</span>
-                <span class="train-route">Basel SBB <span class="route-arrow">→</span> Locarno</span>
-                <div style="flex:1"></div>
-                <span class="day-entry-disc">Abfahrtszeit weicht +2 Min ab</span>
-                <span class="source-tag" style="margin-left:10px">NeTS-AT</span>
-              </div>
-              <div class="day-entry-row">
-                <input type="checkbox" class="accordion-checkbox" />
-                <span class="train-id">IC 723</span>
-                <span class="train-route">Zürich HB <span class="route-arrow">→</span> Genève-Aéroport</span>
-                <div style="flex:1"></div>
-                <span class="day-entry-disc">Halt in Bern fehlt</span>
-                <span class="source-tag" style="margin-left:10px">CIS</span>
-              </div>
-              <div class="day-entry-row">
-                <input type="checkbox" class="accordion-checkbox" />
-                <span class="train-id">EC 195</span>
-                <span class="train-route">Zürich HB <span class="route-arrow">→</span> Milano Centrale</span>
-                <div style="flex:1"></div>
-                <span class="day-entry-disc">Ankunft weicht −3 Min ab</span>
-                <span class="source-tag" style="margin-left:10px">Hafas</span>
-              </div>
-              <div class="day-entry-row" style="color: var(--color-text-muted); font-size:12.5px; padding-left:44px">
-                … weitere 9 Züge nicht angezeigt
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Di 25.06 -->
-        <div class="accordion-item">
-          <div class="accordion-header" onclick="toggleAccordion(this)">
-            <input type="checkbox" class="accordion-checkbox" onclick="event.stopPropagation()" />
-            <div class="accordion-meta">
-              <div class="day-header">
-                <span class="day-label">Di, 25.06.2026</span>
-              </div>
-              <span class="disc-badge">
-                <span class="day-trains-badge">3 Züge betroffen</span>
-              </span>
-            </div>
-            <span class="accordion-toggle">▶</span>
-          </div>
-          <div class="accordion-body">
-            <div class="day-entry">
-              <div class="day-entry-row">
-                <input type="checkbox" class="accordion-checkbox" />
-                <span class="train-id">IC 921</span>
-                <span class="train-route">Brig <span class="route-arrow">→</span> Romanshorn</span>
-                <div style="flex:1"></div>
-                <span class="day-entry-disc">Zusatzhalt Spiez fehlt in Hafas</span>
-                <span class="source-tag" style="margin-left:10px">CIS</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Mi 26.06 -->
-        <div class="accordion-item">
-          <div class="accordion-header" onclick="toggleAccordion(this)">
-            <input type="checkbox" class="accordion-checkbox" onclick="event.stopPropagation()" />
-            <div class="accordion-meta">
-              <div class="day-header">
-                <span class="day-label">Mi, 26.06.2026</span>
-              </div>
-              <span class="disc-badge">
-                <span class="day-trains-badge">7 Züge betroffen</span>
-              </span>
-            </div>
-            <span class="accordion-toggle">▶</span>
-          </div>
-          <div class="accordion-body">
-            <div class="day-entry">
-              <div class="day-entry-row">
-                <input type="checkbox" class="accordion-checkbox" />
-                <span class="train-id">RE 3291</span>
-                <span class="train-route">Luzern <span class="route-arrow">→</span> Olten</span>
-                <div style="flex:1"></div>
-                <span class="day-entry-disc">Fahrtrichtungswechsel fehlt</span>
-                <span class="source-tag" style="margin-left:10px">Hafas</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-      </div>
-
-      <!-- Bulk Bar -->
-      <div class="bulk-bar">
-        <span class="bulk-info">
-          Auswahl: <strong>0 Einträge</strong>
-        </span>
-        <div class="toolbar-spacer"></div>
-        <button class="btn btn-success" onclick="showToast()">
-          ✓ Markierte ins Archiv verschieben
-        </button>
+      <div class="accordion-list" id="tage-list">
+        <div class="empty-state"><span class="empty-icon">⏳</span><span class="empty-title">Daten werden geladen…</span></div>
       </div>
 
     </section><!-- /panel-tage -->
@@ -1706,86 +1384,8 @@
       </div>
 
       <!-- Archive Entries -->
-      <div style="display:flex; flex-direction:column; gap:8px;">
-
-        <div class="archive-entry">
-          <div class="archive-entry-header" onclick="toggleArchive(this)">
-            <div class="archive-meta">
-              <div class="archive-train">IC 723 <span class="text-muted font-bold separator">·</span>
-                <span style="font-weight:400; font-size:13px">Zürich HB → Genève-Aéroport</span>
-              </div>
-              <div class="archive-route">bearbeitet: 22.06.2026, 14:33 Uhr</div>
-            </div>
-            <span class="archive-badge">✓ Erledigt</span>
-            <span class="accordion-toggle" style="margin-left:12px">▶</span>
-          </div>
-          <div class="archive-body">
-            <div class="archive-detail">
-              <div><strong>Datum:</strong> 24.06.2026 &nbsp;|&nbsp; <strong>Quelle:</strong> <span class="source-tag">NeTS-AT</span></div>
-              <div style="margin-top:6px"><strong>Diskrepanz:</strong> Abfahrtszeit weicht um +2 Min ab gegenüber CIS und Hafas.</div>
-              <div class="audit-line">
-                ✓ Bearbeitet von <strong>M. Müller</strong> am 22.06.2026, 14:33 Uhr
-              </div>
-            </div>
-            <div class="archive-actions">
-              <button class="btn btn-secondary btn-sm">↩ Wiederherstellen</button>
-              <button class="btn btn-ghost btn-sm">📋 Details anzeigen</button>
-            </div>
-          </div>
-        </div>
-
-        <div class="archive-entry">
-          <div class="archive-entry-header" onclick="toggleArchive(this)">
-            <div class="archive-meta">
-              <div class="archive-train">IR 2044 <span class="text-muted font-bold separator">·</span>
-                <span style="font-weight:400; font-size:13px">St. Gallen → Bern</span>
-              </div>
-              <div class="archive-route">bearbeitet: 21.06.2026, 09:15 Uhr</div>
-            </div>
-            <span class="archive-badge">✓ Erledigt</span>
-            <span class="accordion-toggle" style="margin-left:12px">▶</span>
-          </div>
-          <div class="archive-body">
-            <div class="archive-detail">
-              <div><strong>Datum:</strong> 22.06.2026 &nbsp;|&nbsp; <strong>Quelle:</strong> <span class="source-tag">CIS</span></div>
-              <div style="margin-top:6px"><strong>Diskrepanz:</strong> Halt Winterthur in CIS als fakultativ markiert, in Hafas als regulär.</div>
-              <div class="audit-line">
-                ✓ Bearbeitet von <strong>S. Keller</strong> am 21.06.2026, 09:15 Uhr
-              </div>
-            </div>
-            <div class="archive-actions">
-              <button class="btn btn-secondary btn-sm">↩ Wiederherstellen</button>
-              <button class="btn btn-ghost btn-sm">📋 Details anzeigen</button>
-            </div>
-          </div>
-        </div>
-
-        <div class="archive-entry">
-          <div class="archive-entry-header" onclick="toggleArchive(this)">
-            <div class="archive-meta">
-              <div class="archive-train">EC 195 <span class="text-muted font-bold separator">·</span>
-                <span style="font-weight:400; font-size:13px">Zürich HB → Milano Centrale</span>
-              </div>
-              <div class="archive-route">bearbeitet: 20.06.2026, 16:48 Uhr</div>
-            </div>
-            <span class="archive-badge">✓ Erledigt</span>
-            <span class="accordion-toggle" style="margin-left:12px">▶</span>
-          </div>
-          <div class="archive-body">
-            <div class="archive-detail">
-              <div><strong>Datum:</strong> 20.06.2026 &nbsp;|&nbsp; <strong>Quelle:</strong> <span class="source-tag">Hafas</span></div>
-              <div style="margin-top:6px"><strong>Diskrepanz:</strong> Ankunftszeit in Chiasso weicht um −3 Min ab gegenüber NeTS-AT und CIS.</div>
-              <div class="audit-line">
-                ✓ Bearbeitet von <strong>T. Baumann</strong> am 20.06.2026, 16:48 Uhr
-              </div>
-            </div>
-            <div class="archive-actions">
-              <button class="btn btn-secondary btn-sm">↩ Wiederherstellen</button>
-              <button class="btn btn-ghost btn-sm">📋 Details anzeigen</button>
-            </div>
-          </div>
-        </div>
-
+      <div style="display:flex; flex-direction:column; gap:8px;" id="archiveEntries">
+        <!-- Populated dynamically when items are marked as done -->
       </div>
 
     </section><!-- /panel-archiv -->
@@ -1975,6 +1575,449 @@
 
 <!-- ===================== JAVASCRIPT ===================== -->
 <script>
+  // ---- API BASE URL ----
+  const API_BASE_URL = '/api';
+  const ARCHIVE_KEYS_STORAGE_KEY = 'dreamteam.archivedDiscrepancyKeys';
+  const ARCHIVE_RECORDS_STORAGE_KEY = 'dreamteam.archiveRecords';
+  const archivedDiscrepancyKeys = new Set();
+  const discrepancyIndex = new Map();
+  const expandedTrainIds = new Set();
+  const expandedDayDates = new Set();
+  let archiveRecords = [];
+  let trainDataCache = [];
+  let dayDataCache = [];
+
+  function stripHtml(value) {
+    const temp = document.createElement('div');
+    temp.innerHTML = value || '';
+    return temp.textContent || temp.innerText || '';
+  }
+
+  function buildDiscrepancyKey(trainId, disc) {
+    const text = stripHtml(disc?.text || '').replace(/\s+/g, ' ').trim();
+    const halt = (disc?.halt || '').trim();
+    const source = (disc?.source || '').trim();
+    const date = (disc?.date || '').trim();
+    return [trainId || '', date, halt, source, text].join('||');
+  }
+
+  function getTimestampNow() {
+    const now = new Date();
+    const pad = n => String(n).padStart(2, '0');
+    return `${pad(now.getDate())}.${pad(now.getMonth() + 1)}.${now.getFullYear()}, ${pad(now.getHours())}:${pad(now.getMinutes())} Uhr`;
+  }
+
+  function addArchiveEntry(record, prepend = true) {
+    const archiveEntries = document.getElementById('archiveEntries');
+    if (!archiveEntries || !record) return;
+
+    const archiveEntry = document.createElement('div');
+    archiveEntry.className = 'archive-entry';
+    archiveEntry.dataset.archiveKey = record.key || '';
+    archiveEntry.innerHTML = `
+      <div class="archive-entry-header" onclick="toggleArchive(this)">
+        <div class="archive-meta">
+          <div class="archive-train">${record.trainId || 'Unbekannter Zug'} <span class="text-muted font-bold separator">·</span>
+            <span style="font-weight:400; font-size:13px">${record.route || ''}</span>
+          </div>
+          <div class="archive-route">bearbeitet: ${record.timestamp}</div>
+        </div>
+        <span class="archive-badge">✓ Erledigt</span>
+        <span class="accordion-toggle" style="margin-left:12px">▶</span>
+      </div>
+      <div class="archive-body">
+        <div class="archive-detail">
+          <div><strong>Datum:</strong> ${record.date || '-'} &nbsp;|&nbsp; <strong>Quelle:</strong> <span class="source-tag">${record.source || 'Unbekannt'}</span></div>
+          <div style="margin-top:6px"><strong>Diskrepanz:</strong> ${record.discrepancy || ''}</div>
+          <div class="audit-line">
+            ✓ Bearbeitet von <strong>M. Müller</strong> am ${record.timestamp}
+          </div>
+        </div>
+        <div class="archive-actions">
+          <button class="btn btn-secondary btn-sm" onclick="restoreArchivedEntry(this, event)">↩ Wiederherstellen</button>
+          <button class="btn btn-ghost btn-sm">📋 Details anzeigen</button>
+        </div>
+      </div>
+    `;
+    if (prepend) {
+      archiveEntries.prepend(archiveEntry);
+    } else {
+      archiveEntries.appendChild(archiveEntry);
+    }
+  }
+
+  function saveArchiveState() {
+    localStorage.setItem(ARCHIVE_KEYS_STORAGE_KEY, JSON.stringify(Array.from(archivedDiscrepancyKeys)));
+    localStorage.setItem(ARCHIVE_RECORDS_STORAGE_KEY, JSON.stringify(archiveRecords));
+  }
+
+  function restoreArchiveState() {
+    try {
+      const rawKeys = localStorage.getItem(ARCHIVE_KEYS_STORAGE_KEY);
+      const rawRecords = localStorage.getItem(ARCHIVE_RECORDS_STORAGE_KEY);
+
+      if (rawKeys) {
+        const parsedKeys = JSON.parse(rawKeys);
+        if (Array.isArray(parsedKeys)) {
+          parsedKeys.forEach(key => {
+            if (typeof key === 'string' && key.trim()) {
+              archivedDiscrepancyKeys.add(key);
+            }
+          });
+        }
+      }
+
+      if (rawRecords) {
+        const parsedRecords = JSON.parse(rawRecords);
+        if (Array.isArray(parsedRecords)) {
+          archiveRecords = parsedRecords.filter(record => (
+            record &&
+            typeof record === 'object' &&
+            typeof record.key === 'string' &&
+            typeof record.timestamp === 'string'
+          ));
+        }
+      }
+    } catch (error) {
+      console.warn('Archive state could not be restored:', error);
+      archiveRecords = [];
+      archivedDiscrepancyKeys.clear();
+    }
+
+    const archiveEntries = document.getElementById('archiveEntries');
+    if (archiveEntries) {
+      archiveEntries.innerHTML = '';
+      archiveRecords.forEach(record => addArchiveEntry(record, false));
+    }
+
+    updateArchiveBadge();
+  }
+
+  function refreshDiscrepancyPanels() {
+    populateTrainAccordion(trainDataCache);
+    populateDayAccordion(dayDataCache);
+    applyFilters('zuege');
+    applyFilters('tage');
+  }
+
+  function archiveByKeys(keys) {
+    const timestamp = getTimestampNow();
+    let archivedCount = 0;
+
+    keys.forEach(key => {
+      if (!key || archivedDiscrepancyKeys.has(key)) return;
+      archivedDiscrepancyKeys.add(key);
+      const record = discrepancyIndex.get(key);
+      if (record) {
+        const archiveRecord = {
+          key,
+          ...record,
+          timestamp
+        };
+        archiveRecords.unshift(archiveRecord);
+        addArchiveEntry(archiveRecord);
+      }
+      archivedCount += 1;
+    });
+
+    if (archivedCount > 0) {
+      saveArchiveState();
+      refreshDiscrepancyPanels();
+      updateArchiveBadge();
+    }
+
+    return archivedCount;
+  }
+
+  function restoreArchivedEntry(btn, event) {
+    if (event) event.stopPropagation();
+
+    const archiveEntryEl = btn?.closest('.archive-entry');
+    const key = archiveEntryEl?.dataset?.archiveKey || '';
+    if (!key) {
+      showToast('Wiederherstellung nicht möglich.');
+      return;
+    }
+
+    const wasArchived = archivedDiscrepancyKeys.delete(key);
+    archiveRecords = archiveRecords.filter(record => record.key !== key);
+
+    if (archiveEntryEl) {
+      archiveEntryEl.remove();
+    }
+
+    saveArchiveState();
+    refreshDiscrepancyPanels();
+    updateArchiveBadge();
+
+    if (wasArchived) {
+      showToast('Eintrag wiederhergestellt.');
+    } else {
+      showToast('Eintrag wurde bereits wiederhergestellt.');
+    }
+  }
+
+  // ---- Data Loading ----
+  function showListError(listId, message) {
+    const el = document.getElementById(listId);
+    if (el) el.innerHTML = `<div class="empty-state"><span class="empty-icon">⚠️</span><span class="empty-title">Fehler beim Laden</span><span class="empty-desc">${message}</span></div>`;
+  }
+
+  async function loadDiscrepanciesByTrain() {
+    try {
+      const response = await fetch(`${API_BASE_URL}/discrepancies-by-train`);
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const data = await response.json();
+      trainDataCache = data;
+      populateTrainAccordion(data);
+      updateStats();
+    } catch (error) {
+      console.error('Error loading train discrepancies:', error);
+      showListError('zuege-list', `API nicht erreichbar: ${error.message}`);
+    }
+  }
+
+  async function loadDiscrepanciesByDay() {
+    try {
+      const response = await fetch(`${API_BASE_URL}/discrepancies-by-day`);
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const data = await response.json();
+      dayDataCache = data;
+      populateDayAccordion(data);
+    } catch (error) {
+      console.error('Error loading day discrepancies:', error);
+      showListError('tage-list', `API nicht erreichbar: ${error.message}`);
+    }
+  }
+
+  async function updateStats() {
+    try {
+      const response = await fetch(`${API_BASE_URL}/stats`);
+      const stats = await response.json();
+      updatePageStats(stats);
+    } catch (error) {
+      console.error('Error loading stats:', error);
+    }
+  }
+
+  // ---- Populate Train Accordion ----
+  function populateTrainAccordion(trains) {
+    const accordionList = document.getElementById('zuege-list');
+    if (!accordionList) return;
+
+    const visibleTrains = trains
+      .map(train => {
+        const openDiscrepancies = train.discrepancies.filter(disc => {
+          const key = buildDiscrepancyKey(train.train_id, disc);
+          return !archivedDiscrepancyKeys.has(key);
+        });
+        return {
+          ...train,
+          discrepancies: openDiscrepancies,
+          discrepancy_count: openDiscrepancies.length
+        };
+      })
+      .filter(train => train.discrepancies.length > 0);
+
+    if (!visibleTrains.length) {
+      accordionList.innerHTML = '<div class="empty-state"><span class="empty-icon">✅</span><span class="empty-title">Keine offenen Diskrepanzen</span></div>';
+      return;
+    }
+    accordionList.innerHTML = ''; // Clear existing items
+
+    visibleTrains.forEach(train => {
+      const item = document.createElement('div');
+      item.className = 'accordion-item';
+      item.dataset.trainId = train.train_id || '';
+
+      const discrepanciesHtml = train.discrepancies
+        .map(disc => {
+          const key = buildDiscrepancyKey(train.train_id, disc);
+          discrepancyIndex.set(key, {
+            trainId: train.train_id,
+            route: train.route,
+            date: disc.date,
+            source: disc.source,
+            discrepancy: stripHtml(disc.text).replace(/\s+/g, ' ').trim()
+          });
+          const remarksHtml = disc.ares_remarks && disc.ares_remarks.length > 0
+            ? `<div class="disc-entry-detail"><span class="detail-label">ARES:</span>${disc.ares_remarks.join(' · ')}</div>`
+            : '';
+          return `
+          <div class="disc-entry" data-disc-key="${key}">
+            <div class="disc-entry-header">
+              <span class="disc-entry-date">${disc.date}</span>
+              <span class="source-tag">${disc.source}</span>
+            </div>
+            <div class="disc-entry-text">
+              ${disc.text}
+            </div>
+            ${remarksHtml}
+            <div class="disc-entry-actions">
+              <button class="btn btn-ghost btn-sm">📋 Details</button>
+              <button class="btn btn-success btn-sm" onclick="markDone(this)">✓ Als bearbeitet markieren</button>
+            </div>
+          </div>
+          `;
+        })
+        .join('');
+
+      const isExpanded = expandedTrainIds.has(train.train_id);
+      item.innerHTML = `
+        <div class="accordion-header" onclick="toggleAccordion(this)">
+          <div class="accordion-meta">
+            <span class="train-id">${train.train_id}</span>
+            <span class="train-route">
+              ${train.route}
+            </span>
+            <button class="btn btn-success btn-sm" onclick="markTrainDone(this, event)">✓ Alles als bearbeitet markieren</button>
+            <span class="disc-badge">
+              <span class="disc-count">${train.discrepancy_count} Diskrepanz${train.discrepancy_count !== 1 ? 'en' : ''}</span>
+            </span>
+          </div>
+          <span class="accordion-toggle">▶</span>
+        </div>
+        <div class="accordion-body">
+          ${discrepanciesHtml}
+        </div>
+      `;
+
+      if (isExpanded) {
+        const header = item.querySelector('.accordion-header');
+        const body = item.querySelector('.accordion-body');
+        const toggle = item.querySelector('.accordion-toggle');
+        header?.classList.add('open');
+        body?.classList.add('open');
+        toggle?.classList.add('open');
+      }
+
+      accordionList.appendChild(item);
+    });
+  }
+
+  // ---- Populate Day Accordion ----
+  function populateDayAccordion(days) {
+    const accordionList = document.getElementById('tage-list');
+    if (!accordionList) return;
+
+    const visibleDays = days
+      .map(day => {
+        const openTrains = day.trains
+          .map(train => {
+            const openDiscrepancies = train.discrepancies.filter(disc => {
+              const key = buildDiscrepancyKey(train.train_id, disc);
+              return !archivedDiscrepancyKeys.has(key);
+            });
+            return {
+              ...train,
+              discrepancies: openDiscrepancies
+            };
+          })
+          .filter(train => train.discrepancies.length > 0);
+
+        return {
+          ...day,
+          trains: openTrains,
+          train_count: openTrains.length
+        };
+      })
+      .filter(day => day.trains.length > 0);
+
+    if (!visibleDays.length) {
+      accordionList.innerHTML = '<div class="empty-state"><span class="empty-icon">✅</span><span class="empty-title">Keine offenen Diskrepanzen</span></div>';
+      return;
+    }
+    accordionList.innerHTML = ''; // Clear existing items
+
+    visibleDays.forEach(day => {
+      const item = document.createElement('div');
+      item.className = 'accordion-item';
+      item.dataset.dayDate = day.date || '';
+
+      const trainRowsHtml = day.trains
+        .map(train => {
+          const keys = train.discrepancies.map(disc => {
+            const key = buildDiscrepancyKey(train.train_id, disc);
+            discrepancyIndex.set(key, {
+              trainId: train.train_id,
+              route: train.route,
+              date: disc.date,
+              source: disc.source,
+              discrepancy: stripHtml(disc.text).replace(/\s+/g, ' ').trim()
+            });
+            return key;
+          });
+          const discText = train.discrepancies.map(d => d.text).join('; ');
+          const sources = [...new Set(train.discrepancies.map(d => d.source).filter(Boolean))];
+          const source = sources.length ? sources.join(', ') : 'Unbekannt';
+          return `
+            <div class="day-entry-row" data-disc-keys="${keys.join('@@@')}">
+              <span class="train-id">${train.train_id}</span>
+              <span class="train-route">${train.route}</span>
+              <div style="flex:1"></div>
+              <span class="day-entry-disc">${discText}</span>
+              <span class="source-tag" style="margin-left:10px">${source}</span>
+              <button class="btn btn-success btn-sm" style="margin-left:10px" onclick="markDayTrainDone(this)">✓ Als bearbeitet markieren</button>
+            </div>
+          `;
+        })
+        .join('');
+
+      const isExpanded = expandedDayDates.has(day.date);
+      item.innerHTML = `
+        <div class="accordion-header" onclick="toggleAccordion(this)">
+          <div class="accordion-meta">
+            <div class="day-header">
+              <span class="day-label">${formatDate(day.date)}</span>
+            </div>
+            <button class="btn btn-success btn-sm" onclick="markDayDone(this, event)">✓ Alles als bearbeitet markieren</button>
+            <span class="disc-badge">
+              <span class="day-trains-badge">${day.train_count} Züge betroffen</span>
+            </span>
+          </div>
+          <span class="accordion-toggle">▶</span>
+        </div>
+        <div class="accordion-body">
+          <div class="day-entry">
+            ${trainRowsHtml}
+          </div>
+        </div>
+      `;
+
+      if (isExpanded) {
+        const header = item.querySelector('.accordion-header');
+        const body = item.querySelector('.accordion-body');
+        const toggle = item.querySelector('.accordion-toggle');
+        header?.classList.add('open');
+        body?.classList.add('open');
+        toggle?.classList.add('open');
+      }
+
+      accordionList.appendChild(item);
+    });
+  }
+
+  // ---- Format Date ----
+  function formatDate(dateStr) {
+    try {
+      const [year, month, day] = dateStr.split('-');
+      const date = new Date(year, parseInt(month) - 1, day);
+      const days = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
+      const dayName = days[date.getDay()];
+      return `${dayName}, ${day}.${month}.${year}`;
+    } catch {
+      return dateStr;
+    }
+  }
+
+  // ---- Update Page Stats ----
+  function updatePageStats(stats) {
+    const descEl = document.querySelector('#panel-zuege .page-desc');
+    if (descEl) {
+      descEl.textContent = `${stats.total_discrepancies} offene Diskrepanzen in ${stats.affected_trains} Zügen`;
+    }
+  }
+
   // ---- Panel switching ----
   function switchPanel(id) {
     document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
@@ -1986,6 +2029,11 @@
   // Set initial active nav
   document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('nav-zuege').classList.add('active');
+    restoreArchiveState();
+    
+    // Load data from API
+    loadDiscrepanciesByTrain();
+    loadDiscrepanciesByDay();
   });
 
   // ---- Accordion toggle ----
@@ -1993,15 +2041,25 @@
     const body = header.nextElementSibling;
     const toggle = header.querySelector('.accordion-toggle');
     const isOpen = header.classList.contains('open');
+    const item = header.closest('.accordion-item');
+    const list = header.closest('.accordion-list');
+    const isTrainList = list?.id === 'zuege-list';
+    const isDayList = list?.id === 'tage-list';
+    const trainId = item?.dataset?.trainId;
+    const dayDate = item?.dataset?.dayDate;
 
     if (isOpen) {
       header.classList.remove('open');
       body.classList.remove('open');
       toggle.classList.remove('open');
+      if (isTrainList && trainId) expandedTrainIds.delete(trainId);
+      if (isDayList && dayDate) expandedDayDates.delete(dayDate);
     } else {
       header.classList.add('open');
       body.classList.add('open');
       toggle.classList.add('open');
+      if (isTrainList && trainId) expandedTrainIds.add(trainId);
+      if (isDayList && dayDate) expandedDayDates.add(dayDate);
     }
   }
 
@@ -2035,27 +2093,115 @@
     }
   }
 
+  // ---- Update badge count ----
+  function updateBadgeCount(item) {
+    if (!item) return;
+    const badgeEl = item.querySelector('.disc-count');
+    const entryCount = item.querySelectorAll('.disc-entry').length;
+    if (badgeEl) {
+      badgeEl.textContent = entryCount === 1 ? '1 Diskrepanz' : `${entryCount} Diskrepanzen`;
+    }
+  }
+
+  // ---- Update archive badge count ----
+  function updateArchiveBadge() {
+    const archiveEntries = document.getElementById('archiveEntries');
+    const archiveCount = archiveEntries ? archiveEntries.querySelectorAll('.archive-entry').length : 0;
+    const navBadge = document.querySelector('.nav-badge.neutral');
+    if (navBadge) {
+      navBadge.textContent = archiveCount;
+    }
+  }
+
   // ---- Mark as done ----
+  function archiveDiscEntry(entry) {
+    if (!entry) return false;
+    const key = entry.dataset.discKey;
+    return archiveByKeys([key]) > 0;
+  }
+
   function markDone(btn) {
     const entry = btn.closest('.disc-entry');
-    entry.style.opacity = '0.5';
-    entry.style.transition = 'opacity 0.3s';
-    btn.textContent = '✓ Erledigt';
-    btn.disabled = true;
-    showToast('Eintrag als bearbeitet markiert. ');
-    setTimeout(() => {
-      entry.style.opacity = '1';
-    }, 1500);
+    if (!archiveDiscEntry(entry)) return;
+    showToast('Eintrag ins Archiv verschoben.');
+  }
+
+  function markTrainDone(btn, event) {
+    if (event) event.stopPropagation();
+
+    const item = btn.closest('.accordion-item');
+    if (!item) return;
+
+    const keys = Array.from(item.querySelectorAll('.disc-entry'))
+      .map(entry => entry.dataset.discKey)
+      .filter(Boolean);
+
+    if (!keys.length) {
+      showToast('Keine offenen Einträge für diesen Zug.');
+      return;
+    }
+
+    const archivedCount = archiveByKeys(keys);
+    showToast(`${archivedCount} Einträge ins Archiv verschoben.`);
+  }
+
+  function markDayTrainDone(btn) {
+    const row = btn.closest('.day-entry-row');
+    if (!row) return;
+
+    const keys = (row.dataset.discKeys || '')
+      .split('@@@')
+      .map(key => key.trim())
+      .filter(Boolean);
+
+    if (!keys.length) {
+      showToast('Keine offenen Einträge für diesen Tag.');
+      return;
+    }
+
+    const archivedCount = archiveByKeys(keys);
+    showToast(`${archivedCount} Einträge ins Archiv verschoben.`);
+  }
+
+  function markDayDone(btn, event) {
+    if (event) event.stopPropagation();
+
+    const item = btn.closest('.accordion-item');
+    if (!item) return;
+
+    const keys = Array.from(item.querySelectorAll('.day-entry-row'))
+      .flatMap(row => (row.dataset.discKeys || '').split('@@@'))
+      .map(key => key.trim())
+      .filter(Boolean);
+
+    if (!keys.length) {
+      showToast('Keine offenen Einträge für diesen Tag.');
+      return;
+    }
+
+    const archivedCount = archiveByKeys([...new Set(keys)]);
+    showToast(`${archivedCount} Einträge ins Archiv verschoben.`);
   }
 
   // ---- Dataload button ----
+  function updateDataloadTimestamp(date) {
+    const timestampEl = document.querySelector('.dataload-timestamp');
+    if (!timestampEl) return;
+
+    const d = date || new Date();
+    const pad = n => String(n).padStart(2, '0');
+    timestampEl.textContent = `${pad(d.getDate())}.${pad(d.getMonth() + 1)}.${d.getFullYear()}, ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  }
+
   function triggerDataload() {
+    const clickTimestamp = new Date();
     const btn = document.getElementById('dataloadBtn');
     btn.disabled = true;
     btn.innerHTML = '<div class="spinner"></div> Wird geladen…';
     setTimeout(() => {
       btn.disabled = false;
       btn.innerHTML = '🔄 Neuen Dataload anfordern';
+      updateDataloadTimestamp(clickTimestamp);
       showToast('✓ Dataload #2452 erfolgreich abgeschlossen. 54 Züge geprüft.');
     }, 2800);
   }
@@ -2087,6 +2233,120 @@
       btn.classList.add('active');
     });
   });
+
+  // ---- Search and Filter Logic ----
+  function applyFilters(panelId) {
+    const panel = document.getElementById(`panel-${panelId}`);
+    if (!panelId || !panel) return;
+
+    // Get search input and source filter for this panel
+    const searchInputs = panel.querySelectorAll('.search-input');
+    const filterSelects = panel.querySelectorAll('.filter-select');
+    
+    if (searchInputs.length === 0 || filterSelects.length === 0) return;
+
+    const searchValue = searchInputs[0].value.toLowerCase().trim();
+    const sourceFilter = filterSelects[0].value; // First select is source filter
+
+    // For "Züge" panel
+    if (panelId === 'zuege') {
+      const items = panel.querySelectorAll('.accordion-item');
+      items.forEach(item => {
+        const trainId = item.querySelector('.train-id')?.textContent.toLowerCase() || '';
+        const trainRoute = item.querySelector('.train-route')?.textContent.toLowerCase() || '';
+        
+        // Check if train matches search criteria
+        const matchesSearch = !searchValue || 
+                             trainId.includes(searchValue) || 
+                             trainRoute.includes(searchValue);
+
+        // Check if entries match source filter
+        let matchesSource = sourceFilter === 'Quelle: Alle';
+        if (!matchesSource) {
+          const entries = item.querySelectorAll('.disc-entry');
+          matchesSource = Array.from(entries).some(entry => {
+            const sourceTag = entry.querySelector('.source-tag')?.textContent.trim();
+            return sourceTag === sourceFilter.split(': ')[1] || sourceTag === sourceFilter;
+          });
+        }
+
+        // Show/hide accordion item
+        item.style.display = (matchesSearch && matchesSource) ? 'block' : 'none';
+      });
+    }
+    
+    // For "Tage" panel
+    if (panelId === 'tage') {
+      const items = panel.querySelectorAll('.accordion-item');
+      items.forEach(item => {
+        const dayEntries = item.querySelectorAll('.day-entry-row');
+        let visibleCount = 0;
+
+        // Check each day-entry-row
+        dayEntries.forEach(entry => {
+          const trainId = entry.querySelector('.train-id')?.textContent.toLowerCase() || '';
+          const trainRoute = entry.querySelector('.train-route')?.textContent.toLowerCase() || '';
+          
+          const matchesSearch = !searchValue || 
+                               trainId.includes(searchValue) || 
+                               trainRoute.includes(searchValue);
+
+          let matchesSource = sourceFilter === 'Quelle: Alle';
+          if (!matchesSource) {
+            const sourceTag = entry.querySelector('.source-tag')?.textContent.trim();
+            matchesSource = sourceTag === sourceFilter.split(': ')[1] || sourceTag === sourceFilter;
+          }
+
+          if (matchesSearch && matchesSource) {
+            entry.style.display = 'flex';
+            visibleCount++;
+          } else {
+            entry.style.display = 'none';
+          }
+        });
+
+        // Hide day accordion if no visible entries
+        item.style.display = visibleCount > 0 ? 'block' : 'none';
+      });
+    }
+  }
+
+  // Add event listeners for search inputs
+  document.querySelectorAll('.search-input').forEach(input => {
+    input.addEventListener('input', (e) => {
+      // Determine which panel this search input belongs to
+      const panel = e.target.closest('.panel');
+      if (!panel) return;
+      
+      const panelId = panel.id.replace('panel-', '');
+      applyFilters(panelId);
+    });
+  });
+
+  // Add event listeners for source filter dropdowns
+  document.querySelectorAll('#panel-zuege .filter-select').forEach((select, index) => {
+    if (index === 0) { // Only first select is source filter
+      select.addEventListener('change', () => {
+        applyFilters('zuege');
+      });
+    }
+  });
+
+  document.querySelectorAll('#panel-tage .filter-select').forEach((select, index) => {
+    if (index === 0) { // Only first select is source filter
+      select.addEventListener('change', () => {
+        applyFilters('tage');
+      });
+    }
+  });
+
+  // ---- Initialize badge counts on page load ----
+  document.querySelectorAll('.accordion-item').forEach(item => {
+    updateBadgeCount(item);
+  });
+
+  // ---- Initialize archive badge count ----
+  updateArchiveBadge();
 </script>
 
 </body>
