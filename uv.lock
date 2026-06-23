@@ -95,7 +95,7 @@ wheels = [
 [[package]]
 name = "dreamteam"
 version = "0.1.0"
-source = { virtual = "." }
+source = { editable = "." }
 dependencies = [
     { name = "openpyxl" },
     { name = "pandas" },
