@@ -1,23 +1,11 @@
-# Our Cool Project
+# Dreamteam
 
-<!-- TODO: Shortly explain what this project is about -->
-Dreamteam
+This is an App that helps the people responsible for night trains to check if the ARES booking system is in sync with the timetable data of different train compainies (SBB, ÖBB and DB).
 
-## Background
 
-<p align="center">
-  <img alt="Hack4Rail Logo" src="img/hack4rail-logo.jpg" width="400"/>
-</p>
+# Installation
 
-This project has been initiated during the [Hack4Rail 2026](https://hack4rail.org/), a joint hackathon organised by the railway companies SBB, ÖBB, and DB in partnership with the OpenRail Association.
+We use uv as a package manager. You can install the package with "uv venv" and then "venv sync" once venv is installed.
+# Data Folder:
 
-## Install
-
-<!-- TODO: Explain how a user can install the software -->
-
-## License
-
-<!-- If you decide for another license, please change it here, and exchange the LICENSE file -->
-
-The content of this repository is licensed under the [Apache 2.0 license](LICENSE).
-
+Data is placed in the folder "data", which is included in the .gitignore file of the repository so no data should be commited to the repo!
