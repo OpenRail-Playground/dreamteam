@@ -23,6 +23,5 @@ combine_data(
     path_fahrplan_zueglaeufe_db=path_fahrplan_zueglaeufe_db,
     path_output_zuege=path_output_zuege,
     path_output_zuglaeufe=path_output_zuglaeufe,
-    path_station_name_mapping=path_station_name_mapping,
     path_train_list=path_train_list,
 )
