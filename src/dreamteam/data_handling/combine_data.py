@@ -1,76 +1,9 @@
 import logging
-import re
-import unicodedata
 from pathlib import Path
 
 import pandas as pd
 
 logger = logging.getLogger(__name__)
-
-
-def _normalize_station_name(value: str) -> str:
-    value = value.replace("ß", "ss")
-    value = unicodedata.normalize("NFKD", value)
-    value = "".join(char for char in value if not unicodedata.combining(char))
-    value = value.strip().lower()
-    value = re.sub(r"\([^)]*\)", " ", value)
-    value = value.replace("bahnhof", " ")
-    value = re.sub(r"\bhbf\b", " ", value)
-    value = value.replace("/donau", " ")
-    value = value.replace("wörther see", "worthersee").replace(
-        "wörthersee", "worthersee"
-    )
-    value = value.replace("centraal", "central").replace("centrale", "central")
-    value = value.replace("st. ", "st ")
-    value = re.sub(r"[^a-z0-9]+", " ", value)
-    value = re.sub(r"\s+", " ", value).strip()
-    return value
-
-
-def apply_station_name_mapping(
-    data_fahrplan_zueglaeufe: pd.DataFrame,
-    station_name_mapping: pd.DataFrame | Path,
-    mapping_column: str,
-) -> pd.DataFrame:
-    """
-    Consolidates values in the `Halt` column to a common station name using
-    the prepared mapping table.
-    """
-    if isinstance(station_name_mapping, pd.DataFrame):
-        mapping_df = station_name_mapping.copy()
-    else:
-        mapping_df = pd.read_csv(station_name_mapping, sep=";", encoding="utf-8")
-
-    target_column = None
-    for candidate in ("common_halt", "standardized_halt"):
-        if candidate in mapping_df.columns:
-            target_column = candidate
-            break
-
-    if target_column is None:
-        raise KeyError("Mapping target column not found in station mapping")
-
-    lookup_df = mapping_df[[mapping_column, target_column]].copy()
-    lookup_df = lookup_df.dropna(subset=[mapping_column, target_column])
-    lookup_df[mapping_column] = lookup_df[mapping_column].astype(str).str.strip()
-    lookup_df[target_column] = lookup_df[target_column].astype(str).str.strip()
-    lookup_df = lookup_df[lookup_df[mapping_column] != ""]
-    lookup_df["_mapping_key"] = lookup_df[mapping_column].map(_normalize_station_name)
-    lookup_df = lookup_df[["_mapping_key", target_column]].drop_duplicates(
-        subset=["_mapping_key"], keep="first"
-    )
-
-    mapped = data_fahrplan_zueglaeufe.copy()
-    if "Halt" in mapped.columns:
-        mapped["_mapping_key"] = mapped["Halt"].where(mapped["Halt"].notna(), "")
-        mapped["_mapping_key"] = (
-            mapped["_mapping_key"].map(str).map(_normalize_station_name)
-        )
-        mapped = mapped.merge(lookup_df, how="left", on="_mapping_key")
-        mapped["Halt"] = mapped[target_column].fillna(mapped["Halt"])
-        mapped = mapped.drop(columns=["_mapping_key", target_column])
-
-    return mapped
 
 
 def combine_data(
@@ -501,3 +434,33 @@ def check_consitency_fahrplan(
         "Konsistenz_Detail"
     ]
     return data_fahrplan_zueglaeufe_joined
+
+
+def main() -> None:
+    path_ares = Path("data/ares_cleaned.csv")
+    path_fahrplan_zuege_sbb = Path("data/sbb_data.csv")
+    path_fahrplan_zuege_oebb = Path("data/oebb_data.csv")
+    path_fahrplan_zuege_db = Path("data/db_data.csv")
+    path_fahrplan_zueglaeufe_sbb = Path("data/sbb_data.csv")
+    path_fahrplan_zueglaeufe_oebb = Path("data/oebb_data.csv")
+    path_fahrplan_zueglaeufe_db = Path("data/db_data.csv")
+    path_output_zuege = Path("data/output_zuege.csv")
+    path_output_zuglaeufe = Path("data/output_zuglaeufe.csv")
+    path_train_list = Path("data/NJ_List.csv")
+
+    combine_data(
+        path_ares=path_ares,
+        path_fahrplan_zuege_sbb=path_fahrplan_zuege_sbb,
+        path_fahrplan_zuege_oebb=path_fahrplan_zuege_oebb,
+        path_fahrplan_zuege_db=path_fahrplan_zuege_db,
+        path_fahrplan_zueglaeufe_sbb=path_fahrplan_zueglaeufe_sbb,
+        path_fahrplan_zueglaeufe_oebb=path_fahrplan_zueglaeufe_oebb,
+        path_fahrplan_zueglaeufe_db=path_fahrplan_zueglaeufe_db,
+        path_output_zuege=path_output_zuege,
+        path_output_zuglaeufe=path_output_zuglaeufe,
+        path_train_list=path_train_list,
+    )
+
+
+if __name__ == "__main__":
+    main()
