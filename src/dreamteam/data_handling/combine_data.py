@@ -336,5 +336,5 @@ def check_consitency_fahrplan(
     """
     Checks the consistency of the fahrplan data.
     """
-
+    # TODO: add consistency checks here
     pass
