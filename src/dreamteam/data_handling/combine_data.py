@@ -140,7 +140,7 @@ def combine_data(
         + train_list["Flügel"].astype(str).str.strip()
     )
 
-    train_list = train_list[["Gruppierung", "Zugnummer"]].drop_duplicates()
+    train_list = train_list[["Gruppierung", "Zugnummer", "Kategorie"]].drop_duplicates()
 
     data_fahrplan_zuege_joined, data_fahrplan_zueglaeufe_joined = combine_fahrplan_data(
         data_fahrplan_zuege_sbb=data_fahrplan_zuege_sbb,
@@ -169,6 +169,7 @@ def combine_data(
         [
             "Datum_Start",
             "Gruppierung",
+            "Kategorie",
             "Zugnummer",
             "Halt",
             "Datum_sbb",
@@ -180,6 +181,7 @@ def combine_data(
             "Datum_oebb",
             "an_oebb",
             "ab_oebb",
+            "ARES_info",
         ]
     ].to_csv(path_output_zuglaeufe, index=False, sep=";")
 
@@ -275,10 +277,14 @@ def combine_fahrplan_data(
     )
 
     data_fahrplan_zuege_joined = data_fahrplan_zuege_joined.merge(
-        train_list[["Gruppierung", "Zugnummer"]], how="left", on="Zugnummer"
+        train_list[["Gruppierung", "Zugnummer", "Kategorie"]],
+        how="left",
+        on="Zugnummer",
     ).sort_values(by=["Zugnummer", "Datum"], ignore_index=True)
     data_fahrplan_zueglaeufe_joined = data_fahrplan_zueglaeufe_joined.merge(
-        train_list[["Gruppierung", "Zugnummer"]], how="left", on="Zugnummer"
+        train_list[["Gruppierung", "Zugnummer", "Kategorie"]],
+        how="left",
+        on="Zugnummer",
     )
 
     # Add datetime_min column for proper chronological sorting
@@ -305,9 +311,21 @@ def combine_fahrplan_data(
 
 def expand_ares_data(data_ares: pd.DataFrame) -> pd.DataFrame:
     """
-    Expands the ares data by splitting the train into individual entries per date
+    Expands ARES entries to one row per date between start_date and end_date.
     """
-    data_ares_expanded = pd.DataFrame()
+    data = data_ares.copy()
+    data["start_date"] = pd.to_datetime(data["start_date"])
+    data["end_date"] = pd.to_datetime(data["end_date"])
+
+    data = data[data["start_date"].notna() & data["end_date"].notna()].copy()
+
+    data["Datum"] = [
+        pd.date_range(start=start, end=end, freq="D")
+        for start, end in zip(data["start_date"], data["end_date"])
+    ]
+    data_ares_expanded = data.explode("Datum", ignore_index=True)
+    data_ares_expanded["Datum"] = data_ares_expanded["Datum"].dt.strftime("%Y-%m-%d")
+
     return data_ares_expanded
 
 
@@ -320,10 +338,35 @@ def combine_data_zuege(
     Combines the ares data with the fahrplan data into one dataframe.
     """
 
-    expand_ares_data(data_ares)
+    data_ares_expanded = expand_ares_data(data_ares)
+
+    data_ares_expanded["ARES_info"] = data_ares_expanded.apply(
+        lambda row: (
+            f"{row['start_date'].strftime('%Y-%m-%d')} - {row['end_date'].strftime('%Y-%m-%d')}, {row['start_station']} - {row['end_station']}: {row['Grund der Sperre']}"
+        ),
+        axis=1,
+    )
+
+    ares_train_column = (
+        "Zugnummer" if "Zugnummer" in data_ares_expanded.columns else "Zug"
+    )
+    data_ares_expanded["train_number_clean"] = (
+        data_ares_expanded[ares_train_column].astype(str).str.extract(r"(\d+)")[0]
+    )
+    data_ares_expanded = data_ares_expanded.rename(columns={"Datum": "Datum_Start"})
+
+    data_fahrplan_for_merge = data_fahrplan_zueglaeufe.copy()
+    data_fahrplan_for_merge["train_number_clean"] = (
+        data_fahrplan_for_merge["Zugnummer"].astype(str).str.extract(r"(\d+)")[0]
+    )
+
+    data_zueglaeufe_joined = data_fahrplan_for_merge.merge(
+        data_ares_expanded[["Datum_Start", "train_number_clean", "ARES_info"]],
+        how="left",
+        on=["Datum_Start", "train_number_clean"],
+    ).drop(columns=["train_number_clean"])
 
     data_zuege_joined = data_fahrplan_zuege
-    data_zueglaeufe_joined = data_fahrplan_zueglaeufe
 
     return data_zuege_joined, data_zueglaeufe_joined
 
