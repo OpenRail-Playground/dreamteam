@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login - Fahrplan-Diskrepanz-Analyzer</title>
+  <style>
+    /* ===========================
+       CSS RESET & VARIABLES
+    =========================== */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --color-primary:       #EB0000;
+      --color-primary-dark:  #CC0000;
+      --color-primary-light: #FFEAEA;
+      --color-bg:            #F5F7FA;
+      --color-surface:       #FFFFFF;
+      --color-border:        #DDE2EA;
+      --color-text:          #1A1A2E;
+      --color-text-muted:    #6B7280;
+      --color-text-light:    #9CA3AF;
+      --color-success:       #16A34A;
+      --color-success-bg:    #DCFCE7;
+      --font-sans:           'Segoe UI', system-ui, -apple-system, sans-serif;
+      --radius-md:           8px;
+      --shadow-md:           0 4px 12px rgba(0,0,0,0.10);
+      --transition:          0.18s ease;
+    }
+
+    html, body {
+      font-family: var(--font-sans);
+      background-color: var(--color-bg);
+      color: var(--color-text);
+      height: 100%;
+      width: 100%;
+    }
+
+    /* ===========================
+       LOGIN CONTAINER
+    =========================== */
+    .login-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+      background: linear-gradient(135deg, #F5F7FA 0%, #E8ECFF 100%);
+    }
+
+    .login-card {
+      background-color: var(--color-surface);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-md);
+      padding: 48px 40px;
+      width: 100%;
+      max-width: 400px;
+      animation: slideIn 0.4s ease;
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* ===========================
+       LOGO
+    =========================== */
+    .logo-section {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .logo-section img {
+      max-width: 120px;
+      height: auto;
+      display: block;
+      margin: 0 auto 20px;
+    }
+
+    .logo-section h1 {
+      font-size: 24px;
+      font-weight: 600;
+      color: var(--color-text);
+      margin: 0;
+    }
+
+    .logo-section p {
+      font-size: 14px;
+      color: var(--color-text-muted);
+      margin-top: 8px;
+    }
+
+    /* ===========================
+       FORM ELEMENTS
+    =========================== */
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--color-text);
+      margin-bottom: 8px;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="password"] {
+      width: 100%;
+      padding: 12px 14px;
+      font-size: 14px;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      background-color: var(--color-surface);
+      color: var(--color-text);
+      transition: border-color var(--transition), box-shadow var(--transition);
+      font-family: inherit;
+    }
+
+    input[type="text"]:focus,
+    input[type="email"]:focus,
+    input[type="password"]:focus {
+      outline: none;
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 3px var(--color-primary-light);
+    }
+
+    /* ===========================
+       BUTTONS
+    =========================== */
+    .login-button {
+      width: 100%;
+      padding: 12px 16px;
+      font-size: 15px;
+      font-weight: 600;
+      color: white;
+      background-color: var(--color-primary);
+      border: none;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: background-color var(--transition), transform var(--transition);
+      font-family: inherit;
+      margin-top: 8px;
+    }
+
+    .login-button:hover {
+      background-color: var(--color-primary-dark);
+      transform: translateY(-2px);
+    }
+
+    .login-button:active {
+      transform: translateY(0);
+    }
+
+    .login-button:disabled {
+      background-color: var(--color-text-light);
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+
+    /* ===========================
+       FOOTER
+    =========================== */
+    .login-footer {
+      text-align: center;
+      margin-top: 24px;
+      padding-top: 20px;
+      border-top: 1px solid var(--color-border);
+      font-size: 13px;
+      color: var(--color-text-muted);
+    }
+
+    /* ===========================
+       RESPONSIVE
+    =========================== */
+    @media (max-width: 480px) {
+      .login-card {
+        padding: 32px 24px;
+      }
+
+      .logo-section h1 {
+        font-size: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <div class="login-card">
+      <div class="logo-section">
+        <img src="/logo/Nightvision Logo.svg" alt="Fahrplan-Diskrepanz-Analyzer Logo" />
+        <h1>Login</h1>
+      </div>
+
+      <form id="loginForm">
+        <div class="form-group">
+          <label for="username">Benutzername oder E-Mail</label>
+          <input type="text" id="username" name="username" required placeholder="Enter your username or email" />
+        </div>
+
+        <div class="form-group">
+          <label for="password">Passwort</label>
+          <input type="password" id="password" name="password" required placeholder="Enter your password" />
+        </div>
+
+        <button type="submit" class="login-button">Login</button>
+      </form>
+
+      <div class="login-footer">
+        <p>&copy; 2026 DreamTeam</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      // Redirect to analyzer page regardless of credentials
+      window.location.href = '/';
+    });
+  </script>
+</body>
+</html>

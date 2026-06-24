@@ -104,6 +104,13 @@
       flex-shrink: 0;
     }
 
+    .header-logo img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+    }
+
     .header-title {
       font-size: 17px;
       font-weight: 700;
@@ -1309,8 +1316,8 @@
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      background: var(--color-primary);
-      color: #fff;
+      background: var(--color-info-bg);
+      color: #000000;
       font-size: 13px;
       font-weight: 800;
       padding: 4px 12px;
@@ -1664,9 +1671,11 @@
   <!-- ===================== HEADER ===================== -->
   <header class="header">
     <div class="header-brand">
-      <div class="header-logo">🚆</div>
+      <div class="header-logo">
+        <img src="/logo/Nightvision%20Logo.svg" alt="Nightvision Logo" />
+      </div>
       <div>
-        <div class="header-title">Nightwatch</div>
+        <div class="header-title">Nightvision</div>
         <div class="header-subtitle">Vergleich: SBB · ÖBB · DB</div>
       </div>
     </div>
@@ -1682,8 +1691,8 @@
       </button>
 
       <div class="header-user">
-        <div class="user-avatar">MM</div>
-        <span class="user-name">M. Müller</span>
+        <div class="user-avatar">LVN</div>
+        <span class="user-name">L. Van Niekerk</span>
       </div>
     </div>
   </header>
@@ -3208,21 +3217,30 @@
     thRoute.style.verticalAlign = 'middle';
     headRow1.appendChild(thRoute);
 
-    const groupDefs = [
-      { label: '💺 Sitzplätze SBB', color: '#2563EB' },
-      { label: '💺 Sitzplätze ÖBB', color: '#7C3AED' },
-      { label: '💺 Sitzplätze DB',  color: '#065F46' },
-      { label: '⚙ Status',           color: '#92400E', span: 1 },
-    ];
+    const thSbb = document.createElement('th');
+    thSbb.className = 'col-group-header';
+    thSbb.colSpan = 2;
+    thSbb.textContent = 'SBB';
+    headRow1.appendChild(thSbb);
 
-    groupDefs.forEach(def => {
-      const th = document.createElement('th');
-      th.className = 'col-group-header';
-      th.colSpan = def.span || 2;
-      th.textContent = def.label;
-      th.style.background = def.color;
-      headRow1.appendChild(th);
-    });
+    const thOebb = document.createElement('th');
+    thOebb.className = 'col-group-header';
+    thOebb.colSpan = 2;
+    thOebb.textContent = 'ÖBB';
+    headRow1.appendChild(thOebb);
+
+    const thDb = document.createElement('th');
+    thDb.className = 'col-group-header';
+    thDb.colSpan = 2;
+    thDb.textContent = 'DB';
+    headRow1.appendChild(thDb);
+
+    const thStatusGroup = document.createElement('th');
+    thStatusGroup.className = 'col-group-header';
+    thStatusGroup.colSpan = 1;
+    thStatusGroup.textContent = '⚙ Status';
+    thStatusGroup.style.background = '#92400E';
+    headRow1.appendChild(thStatusGroup);
 
     table.appendChild(headRow1);
 
@@ -3264,7 +3282,6 @@
           <div class="station-dot"></div>
           <div class="station-name-wrap">
             <div class="station-name">${stop.halt}</div>
-            <div class="station-km">${stop.km}</div>
           </div>
         </div>
       `;
@@ -3299,10 +3316,10 @@
       // Status column
       const tdStatus = document.createElement('td');
       tdStatus.className = 'ares-cell';
-      const status = stop.ares_status || 'OK';
-      let statusClass = 'ares-ok';
-      if (status === '✗ Fehlt') statusClass = 'ares-error';
-      else if (status.includes('⚠')) statusClass = 'ares-warning';
+      const rawStatus = (stop.ares_status || '').trim();
+      const status = rawStatus || 'OK';
+      const isOk = !rawStatus || /^OK$/i.test(rawStatus) || /^✓\s*OK$/i.test(rawStatus);
+      const statusClass = isOk ? 'ares-ok' : 'ares-error';
       tdStatus.innerHTML = `<span class="ares-tag ${statusClass}">${status}</span>`;
       tr.appendChild(tdStatus);
 
@@ -3322,7 +3339,7 @@
         <div class="modal-title" id="modalTitle">Zürich HB → Genève-Aéroport</div>
         <div class="modal-meta">
           <div class="modal-meta-item">📅 <strong id="modalDate">24.06.2026</strong></div>
-          <div class="modal-meta-item">⚠️ Quelle: <strong id="modalSource">NeTS-AT</strong></div>
+          <div class="modal-meta-item">⚠️ Fehlerquelle: <strong id="modalSource">NeTS-AT</strong></div>
           <div class="modal-meta-item">🔍 <strong id="modalDisc">Abfahrtszeit weicht um +2 Min ab</strong></div>
         </div>
       </div>
@@ -3349,13 +3366,6 @@
       <div id="matrixContent" style="display:none;">
         <div class="matrix-wrapper">
           <table class="matrix-table" id="matrixTable"></table>
-        </div>
-        <div class="matrix-legend">
-          <span class="legend-title">Legende:</span>
-          <span class="legend-item"><span class="legend-dot legend-arr"></span> Ankunft</span>
-          <span class="legend-item"><span class="legend-dot legend-dep"></span> Abfahrt</span>
-          <span class="legend-item"><span class="legend-dot legend-disc"></span> Abweichung (Warnung)</span>
-          <span class="legend-item"><span class="legend-dot legend-err"></span> Abweichung (Fehler)</span>
         </div>
       </div>
 

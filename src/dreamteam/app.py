@@ -1,9 +1,8 @@
 """Flask backend for the Fahrplan-Diskrepanz-Analyzer."""
 
-import os
 import csv
 from datetime import datetime
-from flask import Flask, jsonify, send_file
+from flask import Flask, jsonify, send_file, send_from_directory
 from pathlib import Path
 
 app = Flask(__name__)
@@ -12,6 +11,8 @@ app = Flask(__name__)
 BASE_DIR = Path(__file__).parent
 DATA_DIR = BASE_DIR / "sample_data"
 ANALYZER_HTML = BASE_DIR / "analyzer.html"
+LOGIN_HTML = BASE_DIR / "login.html"
+LOGO_DIR = BASE_DIR / "logo"
 
 
 def load_csv(filename):
@@ -204,6 +205,20 @@ def index():
     if ANALYZER_HTML.exists():
         return send_file(ANALYZER_HTML, mimetype='text/html')
     return jsonify({"error": "analyzer.html not found"}), 404
+
+
+@app.route('/login', methods=['GET'])
+def login():
+    """Serve the login page."""
+    if LOGIN_HTML.exists():
+        return send_file(LOGIN_HTML, mimetype='text/html')
+    return jsonify({"error": "login.html not found"}), 404
+
+
+@app.route('/logo/<path:filename>', methods=['GET'])
+def serve_logo(filename):
+    """Serve logo assets used by the analyzer UI."""
+    return send_from_directory(LOGO_DIR, filename)
 
 
 @app.route('/api/discrepancies-by-train', methods=['GET'])
