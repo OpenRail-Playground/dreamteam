@@ -23,7 +23,7 @@ Umgebungsvariablen (.env):
 from __future__ import annotations
 
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 
 import pandas as pd
@@ -33,14 +33,19 @@ import requests
 # ---------------------------------------------------------------------------
 # Konfiguration
 # ---------------------------------------------------------------------------
-QUERY_DATE = "2026-06-22"  # gleiches Datum wie DB-/SBB-Skripte
+LAST_N_DAYS = 7
 
 BASE_URL = os.environ.get(
     "OEBB_BASE_URL", "https://api-gateway.oebb.at/gateway/Hafas-API/active"
 ).rstrip("/")
 API_KEY = os.environ.get("OEBB_API_KEY", "")
+PLACES_URL = "https://apis.deutschebahn.com/db/apis/ris-stations/v1/stop-places/"
 
-
+def get_places_headers():
+    return {
+        "db-client-id": os.environ.get("DB_CLIENT_ID_PLACES", ""),
+        "db-api-key": os.environ.get("DB_CLIENT_KEY_PLACES", ""),
+    }
 # ---------------------------------------------------------------------------
 # Hilfsfunktionen
 # ---------------------------------------------------------------------------
@@ -111,7 +116,7 @@ def main() -> None:
 
     nj_list_path = Path("./data/NJ_List.csv")
     all_trains = pd.read_csv(nj_list_path, delimiter=";", header=0)
-    unique_combinations = all_trains[["Gattung", "Stamm"]].drop_duplicates()
+    unique_combinations = all_trains[["Gattung", "Flügel"]].drop_duplicates()
 
     session = requests.Session()
     session.headers.update(
@@ -122,42 +127,58 @@ def main() -> None:
     )
 
     rows: list[dict] = []
-    for _, row in unique_combinations.iterrows():
-        gattung = str(row["Gattung"]).strip()
-        stamm = str(row["Stamm"]).strip()
-        match = f"{gattung} {stamm}"        # z.B. "NJ 470"
-        zugnummer = match
+    seen_journey_ids: set = set()
+    today = datetime.today()
+    dates = [(today + timedelta(days=i)).strftime("%Y-%m-%d") for i in range(1, LAST_N_DAYS + 1)]
+    places_header = get_places_headers()
+    for date_str in dates:
+        for _, row in unique_combinations.iterrows():
+            gattung = str(row["Gattung"]).strip()
+            flügel = str(row["Flügel"]).strip()
+            match = f"{gattung} {flügel}"        # z.B. "NJ 470"
+            zugnummer = match
 
-        journeys = fetch_train_search(session, match, QUERY_DATE)
-        # Nur Journeys, die exakt am QUERY_DATE verkehren
-        journeys = [
-            j for j in journeys if j.get("dayOfOperation") == QUERY_DATE
-        ]
-        if not journeys:
-            print(f"[INFO] Keine Journeys für {match} am {QUERY_DATE}")
-            continue
+            journeys = fetch_train_search(session, match, date_str)
+            journeys = [
+                j for j in journeys if j.get("dayOfOperation") == date_str
+            ]
+            if not journeys:
+                print(f"[INFO] Keine Journeys für {match} am {date_str}")
+                continue
 
-        for j in journeys:
-            ref = j.get("ref")
-            if not ref:
-                continue
-            detail = fetch_journey_detail(session, ref, QUERY_DATE)
-            if not detail:
-                continue
-            stops = (detail.get("Stops") or {}).get("Stop") or []
-            for stop in stops:
-                arr_date, arr_time = _stop_event_iso(stop, "arr")
-                dep_date, dep_time = _stop_event_iso(stop, "dep")
-                ref_date = arr_date or dep_date
-                rows.append(
-                    {
-                        "Datum": ref_date,
-                        "Zugnummer": zugnummer,
-                        "Halt": stop.get("name"),
-                        "an": _fmt_time(arr_time),
-                        "ab": _fmt_time(dep_time),
-                    }
-                )
+            for j in journeys:
+                ref = j.get("ref")
+                if not ref:
+                    continue
+                if ref in seen_journey_ids:
+                    continue
+                seen_journey_ids.add(ref)
+                detail = fetch_journey_detail(session, ref, date_str)
+                if not detail:
+                    continue
+                stops = (detail.get("Stops") or {}).get("Stop") or []
+                for stop in stops:
+                    try:
+                        requested_stop = requests.get(PLACES_URL + stop.get("extId") + '/keys', headers=places_header)
+                        requested_stop = requested_stop.json()
+                        halt_id = next((k["key"] for k in requested_stop.get("keys", []) if k["type"] == "UIC"), stop.get("extId"))
+                    except:
+                        print("Not able to fetch halt_id for stop: ", stop.get("name"))
+                        halt_id = stop.get("extId")
+                    arr_date, arr_time = _stop_event_iso(stop, "arr")
+                    dep_date, dep_time = _stop_event_iso(stop, "dep")
+                    ref_date = arr_date or dep_date
+                    rows.append(
+                        {
+                            "Datum": ref_date,
+                            "Zugnummer": zugnummer,
+                            "Halt": stop.get("name"),
+                            "an": _fmt_time(arr_time),
+                            "ab": _fmt_time(dep_time),
+                            "ReiseID": ref,
+                            "HaltID": halt_id,
+                        }
+                    )
 
     out_path = Path("./data/oebb_data.csv")
     out_path.parent.mkdir(parents=True, exist_ok=True)
