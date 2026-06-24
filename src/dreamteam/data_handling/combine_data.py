@@ -140,7 +140,7 @@ def combine_data(
         + train_list["Flügel"].astype(str).str.strip()
     )
 
-    train_list = train_list[["Gruppierung", "Zugnummer"]].drop_duplicates()
+    train_list = train_list[["Gruppierung", "Zugnummer", "Kategorie"]].drop_duplicates()
 
     data_fahrplan_zuege_joined, data_fahrplan_zueglaeufe_joined = combine_fahrplan_data(
         data_fahrplan_zuege_sbb=data_fahrplan_zuege_sbb,
@@ -169,6 +169,7 @@ def combine_data(
         [
             "Datum_Start",
             "Gruppierung",
+            "Kategorie",
             "Zugnummer",
             "Halt",
             "Datum_sbb",
@@ -275,10 +276,14 @@ def combine_fahrplan_data(
     )
 
     data_fahrplan_zuege_joined = data_fahrplan_zuege_joined.merge(
-        train_list[["Gruppierung", "Zugnummer"]], how="left", on="Zugnummer"
+        train_list[["Gruppierung", "Zugnummer", "Kategorie"]],
+        how="left",
+        on="Zugnummer",
     ).sort_values(by=["Zugnummer", "Datum"], ignore_index=True)
     data_fahrplan_zueglaeufe_joined = data_fahrplan_zueglaeufe_joined.merge(
-        train_list[["Gruppierung", "Zugnummer"]], how="left", on="Zugnummer"
+        train_list[["Gruppierung", "Zugnummer", "Kategorie"]],
+        how="left",
+        on="Zugnummer",
     )
 
     # Add datetime_min column for proper chronological sorting
