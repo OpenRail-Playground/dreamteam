@@ -82,7 +82,7 @@ def combine_data(
     path_fahrplan_zueglaeufe_oebb: Path,
     path_fahrplan_zueglaeufe_db: Path,
     path_output_zuege: Path,
-    path_output_zueglaeufe: Path,
+    path_output_zuglaeufe: Path,
     path_station_name_mapping: Path,
     path_train_list: Path,
 ) -> tuple[pd.DataFrame, pd.DataFrame]:
@@ -109,6 +109,16 @@ def combine_data(
         path_fahrplan_zueglaeufe_db, sep=";", encoding="utf-8"
     )
 
+    data_fahrplan_zueglaeufe_sbb["Datum_Start"] = data_fahrplan_zueglaeufe_sbb.groupby(
+        "ReiseID"
+    )["Datum"].transform("min")
+    data_fahrplan_zueglaeufe_oebb["Datum_Start"] = (
+        data_fahrplan_zueglaeufe_oebb.groupby("ReiseID")["Datum"].transform("min")
+    )
+    data_fahrplan_zueglaeufe_db["Datum_Start"] = data_fahrplan_zueglaeufe_db.groupby(
+        "ReiseID"
+    )["Datum"].transform("min")
+
     station_name_mapping = pd.read_csv(
         path_station_name_mapping, sep=";", encoding="utf-8"
     )
@@ -125,7 +135,9 @@ def combine_data(
 
     train_list = pd.read_csv(path_train_list, sep=";", encoding="utf-8")
     train_list["Zugnummer"] = (
-        train_list["Gattung"] + "_" + train_list["Flügel"].astype(str)
+        train_list["Gattung"].astype(str).str.strip()
+        + " "
+        + train_list["Flügel"].astype(str).str.strip()
     )
 
     train_list = train_list[["Gruppierung", "Zugnummer"]].drop_duplicates()
@@ -153,11 +165,59 @@ def combine_data(
     )
 
     data_zuege_joined.to_csv(path_output_zuege, index=False, sep=";")
-    data_zueglaeufe_joined.to_csv(path_output_zueglaeufe, index=False, sep=";")
+    data_zueglaeufe_joined[
+        [
+            "Datum_Start",
+            "Gruppierung",
+            "Zugnummer",
+            "Halt",
+            "Datum_sbb",
+            "an_sbb",
+            "ab_sbb",
+            "Datum_db",
+            "an_db",
+            "ab_db",
+            "Datum_oebb",
+            "an_oebb",
+            "ab_oebb",
+        ]
+    ].to_csv(path_output_zuglaeufe, index=False, sep=";")
 
     logger.info(
-        f"Combined data saved to {path_output_zuege} and {path_output_zueglaeufe}"
+        f"Combined data saved to {path_output_zuege} and {path_output_zuglaeufe}"
     )
+
+
+def add_datetime_min_column(data_fahrplan_zueglaeufe: pd.DataFrame) -> pd.DataFrame:
+    """
+    Combines each operator's date with their times to create full datetimes,
+    then finds the minimum datetime across all operators and time types.
+    This properly handles times spanning across dates (e.g., 23:00 on day 1 < 00:30 on day 2).
+    """
+    data = data_fahrplan_zueglaeufe.copy()
+    datetime_columns = []
+
+    for operator, datum_col in [
+        ("sbb", "Datum_sbb"),
+        ("db", "Datum_db"),
+        ("oebb", "Datum_oebb"),
+    ]:
+        for time_type in ["ab", "an"]:
+            time_col = f"{time_type}_{operator}"
+            datetime_col = f"datetime_{time_type}_{operator}"
+
+            # Only create if both columns exist
+            if datum_col in data.columns and time_col in data.columns:
+                data[datetime_col] = pd.to_datetime(
+                    data[datum_col].astype(str) + " " + data[time_col].astype(str),
+                    errors="coerce",
+                )
+                datetime_columns.append(datetime_col)
+
+    # Find the minimum datetime across all operators and time types
+    data["datetime_min"] = data[datetime_columns].min(axis=1)
+
+    return data
 
 
 def combine_fahrplan_data(
@@ -193,19 +253,25 @@ def combine_fahrplan_data(
     )
 
     data_fahrplan_zueglaeufe_joined = (
-        data_fahrplan_zueglaeufe_sbb[["Datum", "Zugnummer", "Halt", "an", "ab"]]
+        data_fahrplan_zueglaeufe_sbb[
+            ["Datum_Start", "Datum", "Zugnummer", "Halt", "an", "ab"]
+        ]
         .merge(
-            data_fahrplan_zueglaeufe_db[["Datum", "Zugnummer", "Halt", "an", "ab"]],
+            data_fahrplan_zueglaeufe_db[
+                ["Datum_Start", "Datum", "Zugnummer", "Halt", "an", "ab"]
+            ],
             how="outer",
-            on=["Zugnummer", "Datum", "Halt"],
+            on=["Zugnummer", "Datum_Start", "Halt"],
             suffixes=("_sbb", "_db"),
         )
         .merge(
-            data_fahrplan_zueglaeufe_oebb[["Datum", "Zugnummer", "Halt", "an", "ab"]],
+            data_fahrplan_zueglaeufe_oebb[
+                ["Datum_Start", "Datum", "Zugnummer", "Halt", "an", "ab"]
+            ],
             how="outer",
-            on=["Zugnummer", "Datum", "Halt"],
+            on=["Zugnummer", "Datum_Start", "Halt"],
         )
-        .rename(columns={"an": "an_oebb", "ab": "ab_oebb"})
+        .rename(columns={"an": "an_oebb", "ab": "ab_oebb", "Datum": "Datum_oebb"})
     )
 
     data_fahrplan_zuege_joined = data_fahrplan_zuege_joined.merge(
@@ -213,7 +279,26 @@ def combine_fahrplan_data(
     ).sort_values(by=["Zugnummer", "Datum"], ignore_index=True)
     data_fahrplan_zueglaeufe_joined = data_fahrplan_zueglaeufe_joined.merge(
         train_list[["Gruppierung", "Zugnummer"]], how="left", on="Zugnummer"
-    ).sort_values(by=["Zugnummer", "Datum", "ab_oebb"], ignore_index=True)
+    )
+
+    # Add datetime_min column for proper chronological sorting
+    data_fahrplan_zueglaeufe_joined = add_datetime_min_column(
+        data_fahrplan_zueglaeufe_joined
+    )
+
+    data_fahrplan_zueglaeufe_joined = data_fahrplan_zueglaeufe_joined.sort_values(
+        by=["Zugnummer", "Datum_Start", "datetime_min"], ignore_index=True
+    ).drop(
+        columns=[
+            "datetime_min",
+            "datetime_ab_sbb",
+            "datetime_an_sbb",
+            "datetime_ab_db",
+            "datetime_an_db",
+            "datetime_ab_oebb",
+            "datetime_an_oebb",
+        ]
+    )
 
     return (data_fahrplan_zuege_joined, data_fahrplan_zueglaeufe_joined)
 
