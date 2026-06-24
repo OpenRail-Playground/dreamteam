@@ -1,3 +1,3 @@
-﻿"Version","Datum","Zugnummer","Startbahnhof","Endbahnhof","Datenquelle"
-"1","2026-07-01","459","Zürich Hbf","Berlin Hbf","SBB"
-"1","2026-07-02","459","Zürich Hbf","Berlin Hbf","SBB"
+Version;Datum;Zugnummer;Startbahnhof;Endbahnhof;Datenquelle
+1;2026-07-01;459;Zürich Hbf;Berlin Hbf;SBB
+1;2026-07-02;459;Zürich Hbf;Berlin Hbf;SBB
