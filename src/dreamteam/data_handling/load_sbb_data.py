@@ -17,7 +17,7 @@ Umgebungsvariablen (siehe sbb.env):
 from __future__ import annotations
 
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 
 import pandas as pd
@@ -27,7 +27,7 @@ import requests
 # ---------------------------------------------------------------------------
 # Konfiguration
 # ---------------------------------------------------------------------------
-QUERY_DATE = "2026-06-22"  # gleiches Datum wie DB-Skript
+LAST_N_DAYS = 7
 
 TOKEN_URL = os.environ.get(
     "SBB_TOKEN_URL",
@@ -134,7 +134,7 @@ def fetch_journey_detail(session: requests.Session, journey_id: str) -> dict:
 def main() -> None:
     nj_list_path = Path("./data/NJ_List.csv")
     all_trains = pd.read_csv(nj_list_path, delimiter=";", header=0)
-    unique_combinations = all_trains[["Gattung", "Stamm"]].drop_duplicates()
+    unique_combinations = all_trains[["Gattung", "Flügel"]].drop_duplicates()
 
     token = get_access_token()
     session = requests.Session()
@@ -145,49 +145,59 @@ def main() -> None:
         }
     )
 
+    today = datetime.today()
+    dates = [(today + timedelta(days=i)).strftime("%Y-%m-%d") for i in range(1, LAST_N_DAYS + 1)]
+
     rows: list[dict] = []
-    for _, row in unique_combinations.iterrows():
-        gattung = str(row["Gattung"]).strip()
-        stamm = str(row["Stamm"]).strip()
-        # Format: "<Kategorie> - <Nummer>"  (Leerzeichen-Bindestrich-Leerzeichen)
-        service_ref = f"{gattung} - {stamm}"
-        zugnummer = f"{gattung} {stamm}"
+    seen_journey_ids: set = set()
+    for date_str in dates:
+        for _, row in unique_combinations.iterrows():
+            gattung = str(row["Gattung"]).strip()
+            flügel = str(row["Flügel"]).strip()
+            # Format: "<Kategorie> - <Nummer>"  (Leerzeichen-Bindestrich-Leerzeichen)
+            service_ref = f"{gattung} - {flügel}"
+            zugnummer = f"{gattung} {flügel}"
 
-        try:
-            journey_ids = fetch_journey_ids(session, service_ref, QUERY_DATE)
-        except requests.HTTPError as e:
-            print(f"[WARN] by-service Fehler für {service_ref}: {e}")
-            continue
-
-        if not journey_ids:
-            print(f"[INFO] Keine Journeys für {service_ref} am {QUERY_DATE}")
-            continue
-
-        for jid in journey_ids:
             try:
-                detail = fetch_journey_detail(session, jid)
+                journey_ids = fetch_journey_ids(session, service_ref, date_str)
             except requests.HTTPError as e:
-                print(f"[WARN] Detail Fehler für id={jid}: {e}")
+                print(f"[WARN] by-service Fehler für {service_ref}: {e}")
                 continue
 
-            stop_points = (
-                (detail.get("serviceJourney") or {}).get("stopPoints")
-                or detail.get("stopPoints")
-                or []
-            )
-            for sp in stop_points:
-                arr_iso = _event_time(sp, "arrival")
-                dep_iso = _event_time(sp, "departure")
-                ref_iso = arr_iso or dep_iso
-                rows.append(
-                    {
-                        "Datum": _fmt_date(ref_iso),
-                        "Zugnummer": zugnummer,
-                        "Halt": _stop_name(sp),
-                        "an": _fmt_time(arr_iso),
-                        "ab": _fmt_time(dep_iso),
-                    }
+            if not journey_ids:
+                print(f"[INFO] Keine Journeys für {service_ref} am {date_str}")
+                continue
+
+            for jid in journey_ids:
+                if jid in seen_journey_ids:
+                    continue
+                seen_journey_ids.add(jid)
+                try:
+                    detail = fetch_journey_detail(session, jid)
+                except requests.HTTPError as e:
+                    print(f"[WARN] Detail Fehler für id={jid}: {e}")
+                    continue
+
+                stop_points = (
+                    (detail.get("serviceJourney") or {}).get("stopPoints")
+                    or detail.get("stopPoints")
+                    or []
                 )
+                for sp in stop_points:
+                    arr_iso = _event_time(sp, "arrival")
+                    dep_iso = _event_time(sp, "departure")
+                    ref_iso = arr_iso or dep_iso
+                    rows.append(
+                        {
+                            "Datum": _fmt_date(ref_iso),
+                            "Zugnummer": zugnummer,
+                            "Halt": _stop_name(sp),
+                            "an": _fmt_time(arr_iso),
+                            "ab": _fmt_time(dep_iso),
+                            "ReiseID": jid,
+                            "HaltID": sp.get("place", {}).get("id"),
+                        }
+                    )
 
     out_path = Path("./data/sbb_data.csv")
     out_path.parent.mkdir(parents=True, exist_ok=True)
